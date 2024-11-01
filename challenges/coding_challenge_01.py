@@ -1,4 +1,3 @@
-```python
 from typing import List, Tuple
 from questions_py.types import (
     Category,
@@ -143,7 +142,7 @@ def solution(n: int, m: int, trips_costs: List[Tuple[int, int, int]], c: List[in
     if len(c) != 7:
         return -1  # There must be exactly seven Dragon Balls
 
-    INF = float('inf')
+    INF = 10**18  # Large enough integer instead of float('inf')
 
     # Build the graph
     graph = [[] for _ in range(n + 1)]  # Using 1-based indexing
@@ -200,25 +199,21 @@ def solution(n: int, m: int, trips_costs: List[Tuple[int, int, int]], c: List[in
         if dp[mask][u_idx] < cost:
             continue
 
-        # Collect any new Dragon Balls at the current city
         city = relevant_cities[u_idx]
         new_mask = mask | city_to_balls.get(city, 0)
 
-        # If collected all Dragon Balls, we can return the minimal cost
         if new_mask == (1 << 7) - 1:
             return cost
 
-        # Try moving to other relevant cities
         for v_idx in range(num_cities):
             if u_idx == v_idx:
                 continue
-            next_cost = cost + dist_matrix[u_idx][v_idx]
+            next_cost = int(cost + dist_matrix[u_idx][v_idx])
             if next_cost >= dp[new_mask][v_idx]:
                 continue
             dp[new_mask][v_idx] = next_cost
             heapq.heappush(min_heap, (next_cost, new_mask, v_idx))
 
-    # If we haven't collected all Dragon Balls, return -1
     return -1
 ```
 

@@ -1,0 +1,14 @@
+your_project/
+├── pages/
+│   ├── 1_generate.py
+│   ├── 2_solve.py
+│   ├── 3_format.py
+│   ├── 4_debug.py
+│   └── 5_review.py
+├── generate_questions.py  # becomes the main entry point/home page
+├── utils/
+│   ├── __init__.py
+│   ├── openai_utils.py   # OpenAI related functions
+│   ├── prompts.py        # All prompt templates
+│   └── state_utils.py    # Session state management helpers
+└── config.py 

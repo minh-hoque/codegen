@@ -1,12 +1,17 @@
 import streamlit as st
 from utils.openai_utils import init_openai, solve_problem, validate_unit_tests
 from utils.state_utils import initialize_session_state, set_state_value, save_progress
+from utils.progress_utils import sidebar_progress
 
 
 def render_solve_page():
     st.title("Solve Coding Question")
 
     initialize_session_state()
+
+    # Show progress in sidebar
+    sidebar_progress()
+
     client = init_openai()
 
     if "generated_question" not in st.session_state:
@@ -22,7 +27,8 @@ def render_solve_page():
         with st.spinner("Generating solution..."):
             result = solve_problem(client, str(st.session_state.generated_question))
             if result and result["status"] == "success":
-                st.session_state.solution_text = result["generated_text"]
+                set_state_value("solution_text", result["generated_text"])
+                save_progress()
             else:
                 st.error("Failed to generate solution. Please try again.")
 
@@ -55,7 +61,8 @@ def render_solve_page():
 
         with col2:
             if st.button("Save and Proceed to Format"):
-                st.session_state.solution = edited_solution
+                set_state_value("solution", edited_solution)
+                save_progress()
                 st.switch_page("pages/3_format.py")
 
 

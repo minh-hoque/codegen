@@ -5,6 +5,14 @@ from dataclasses import dataclass
 import importlib.util
 import os
 from pathlib import Path
+from questions_py.types import (
+    Category,
+    Input,
+    LeetcodeLevel,
+    Metadata,
+    Output,
+    UnitTest,
+)
 
 
 @dataclass
@@ -17,9 +25,7 @@ class TestResult:
 
 
 class SolutionTester:
-    def __init__(
-        self, solution_func: Callable[..., Any], unit_tests: List[Dict[str, Any]]
-    ):
+    def __init__(self, solution_func: Callable[..., Any], unit_tests: List[UnitTest]):
         """Initialize the solution tester with a solution function and unit tests."""
         self.solution_func = solution_func
         self.unit_tests = unit_tests
@@ -58,14 +64,12 @@ class SolutionTester:
             self.results.append(result)
         return self.results
 
-    def run_single_test(
-        self, test_case: Dict[str, Any], test_number: int
-    ) -> TestResult:
+    def run_single_test(self, test_case: UnitTest, test_number: int) -> TestResult:
         """Run a single test case and return the result."""
         start_time = time.time()
         try:
-            input_dict = test_case["input"]
-            expected_output = test_case["output"]
+            input_dict = test_case.input
+            expected_output = test_case.output
 
             actual_output = self.solution_func(**input_dict)
             execution_time = time.time() - start_time

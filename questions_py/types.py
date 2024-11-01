@@ -37,8 +37,8 @@ class Output:
 
 @dataclass
 class UnitTest:
-    input: Dict[str, Any]
-    output: Any
+    input: Dict[str, Any]  # Access with test_case.input
+    output: Any  # Access with test_case.output
 
 
 @dataclass

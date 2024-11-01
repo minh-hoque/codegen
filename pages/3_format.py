@@ -1,13 +1,18 @@
 import streamlit as st
 from utils.openai_utils import init_openai, format_solution
 from utils.file_utils import save_challenge_file
-from utils.state_utils import initialize_session_state
+from utils.state_utils import initialize_session_state, save_progress, set_state_value
+from utils.progress_utils import sidebar_progress
 
 
 def render_format_page():
     st.title("Format Solution")
 
     initialize_session_state()
+
+    # Show progress in sidebar
+    sidebar_progress()
+
     client = init_openai()
 
     if "solution" not in st.session_state:
@@ -23,7 +28,8 @@ def render_format_page():
         with st.spinner("Formatting solution..."):
             result = format_solution(client, st.session_state.solution)
             if result and result["status"] == "success":
-                st.session_state.formatted_text = result["generated_text"]
+                set_state_value("formatted_text", result["generated_text"])
+                save_progress()
             else:
                 st.error("Failed to format solution. Please try again.")
 
@@ -42,10 +48,18 @@ def render_format_page():
         with col1:
             if st.button("Save to File"):
                 if edited_formatted_solution:
+                    # Only remove code block markers from start/end
+                    cleaned_solution = edited_formatted_solution
+                    if cleaned_solution.startswith("```python"):
+                        cleaned_solution = cleaned_solution[len("```python") :].lstrip()
+                    if cleaned_solution.endswith("```"):
+                        cleaned_solution = cleaned_solution[:-3].rstrip()
+
                     try:
-                        filepath = save_challenge_file(edited_formatted_solution)
-                        st.session_state.formatted_solution = edited_formatted_solution
-                        st.session_state.challenge_file = filepath
+                        filepath = save_challenge_file(cleaned_solution)
+                        set_state_value("formatted_solution", cleaned_solution)
+                        set_state_value("challenge_file", filepath)
+                        save_progress()
                         st.success(f"Solution saved to {filepath}")
                     except Exception as e:
                         st.error(f"Error saving file: {str(e)}")

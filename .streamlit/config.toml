@@ -1,0 +1,66 @@
+[theme]
+# Primary accent color for interactive elements
+primaryColor = "#0f4c81"
+
+# Background color for the main content area
+backgroundColor = "#ffffff"
+
+# Background color used for the sidebar and most interactive widgets
+secondaryBackgroundColor = "#f1f3f6"
+
+# Color used for almost all text
+textColor = "#31333F"
+
+# Font family for all text in the app, except code blocks
+font = "sans serif"
+
+[server]
+# Max size of uploaded files in MB
+maxUploadSize = 5
+
+# Enable XSRF protection
+enableXsrfProtection = true
+
+# Enable CORS. Disable if you're not using API
+enableCORS = false
+
+[browser]
+# Whether to send usage statistics to Streamlit
+gatherUsageStats = false
+
+# Port where the server will listen for browser connections
+serverPort = 8501
+
+[runner]
+# Handle script rerun requests immediately
+fastReruns = true
+
+# Magic related configurations
+magicEnabled = true
+
+[client]
+# Whether to show a warning when the app is viewed on a mobile device
+showErrorDetails = true
+
+# Timeout for data caching in seconds (1 hour)
+caching.timeToLive = 3600
+
+[logger]
+# Level of logging: "error", "warning", "info", or "debug"
+level = "info"
+
+[mapbox]
+# Configure default mapbox settings
+token = ""
+
+[deprecation]
+# Show deprecation warnings
+showfileUploaderEncoding = false
+showPyplotGlobalUse = false
+
+[global]
+# Development mode
+developmentMode = false
+
+# Disable pyplot warnings
+disableWatchdogWarning = false 

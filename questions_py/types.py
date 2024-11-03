@@ -4,16 +4,25 @@ from typing import Any, Dict, List, Union
 
 
 class Category(Enum):
-    GRAPH = "Graph"
-    DYNAMIC_PROGRAMMING = "Dynamic Programming"
     ARRAY = "Array"
     STRING = "String"
-    TREE = "Tree"
-    BINARY_SEARCH = "Binary Search"
-    GREEDY = "Greedy"
+    HASH_TABLE = "Hash Table"
+    DYNAMIC_PROGRAMMING = "Dynamic Programming"
     MATH = "Math"
-    DFS = "DFS"
-    BFS = "BFS"
+    SORTING = "Sorting"
+    GREEDY = "Greedy"
+    DFS = "Depth First Search"
+    DATABASE = "Database"
+    BINARY_SEARCH = "Binary Search"
+    MATRIX = "Matrix"
+    TREE = "Tree"
+    BFS = "Breadth First Search"
+    BACKTRACKING = "Backtracking"
+    SLIDING_WINDOW = "Sliding Window"
+    HEAP = "Heap Priority Queue"
+    STACK = "Stack"
+    GRAPH = "Graph"
+    GEOMETRY = "Geometry"
 
 
 class LeetcodeLevel(Enum):

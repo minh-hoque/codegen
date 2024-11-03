@@ -3,6 +3,7 @@ from utils.state_utils import (
     initialize_session_state,
     get_current_status,
     clear_session_state,
+    resume_question,
 )
 from config import setup_streamlit
 from utils.components import confirm_dialog
@@ -62,7 +63,9 @@ def show_history():
                 button_clicked = st.button(button_text, key=button_key)
                 if button_clicked:
                     st.session_state[f"button_clicked_{button_key}"] = True
-                    st.session_state[f"pending_question"] = q  # Store the question data
+                    st.session_state[f"pending_question_id"] = q.get(
+                        "id"
+                    )  # Store just the ID
 
                 # Check if we have a pending confirmation
                 if st.session_state.get(f"button_clicked_{button_key}", False):
@@ -70,37 +73,25 @@ def show_history():
                         "Are you sure? Any unsaved progress will be lost.",
                         button_key,
                     ):
-                        # Get the stored question data
-                        q = st.session_state.pop("pending_question")
+                        # Get the stored question ID and resume
+                        question_id = st.session_state.pop("pending_question_id")
                         # Clear the button click state
                         st.session_state[f"button_clicked_{button_key}"] = False
 
-                        # Restore all state from saved question
-                        st.session_state.current_question_id = q.get("id")
-                        st.session_state.selected_categories = q.get("categories", [])
-                        st.session_state.generated_text = q.get("generated_text")
-                        st.session_state.generated_question = q.get(
-                            "generated_question"
-                        )
-                        st.session_state.test_validation = q.get("test_validation")
-                        st.session_state.solution = q.get("solution")
-                        st.session_state.formatted_solution = q.get(
-                            "formatted_solution"
-                        )
-                        st.session_state.challenge_file = q.get("challenge_file")
-                        st.session_state.status = q.get("status")
-
-                        # Redirect to appropriate page based on status
-                        status_to_page = {
-                            "started": "pages/1_generate.py",
-                            "reviewing": "pages/1_generate.py",
-                            "solving": "pages/2_solve.py",
-                            "formatting": "pages/3_format.py",
-                            "debugging": "pages/4_debug.py",
-                            "completed": "pages/5_review.py",
-                        }
-                        if q.get("status") in status_to_page:
-                            st.switch_page(status_to_page[q.get("status")])
+                        # Use the resume_question helper function
+                        if resume_question(question_id):
+                            # Get the status and redirect to appropriate page
+                            status = get_current_status()
+                            status_to_page = {
+                                "started": "pages/1_generate.py",
+                                "reviewing": "pages/1_generate.py",
+                                "solving": "pages/2_solve.py",
+                                "formatting": "pages/3_format.py",
+                                "debugging": "pages/4_debug.py",
+                                "completed": "pages/5_review.py",
+                            }
+                            if status in status_to_page:
+                                st.switch_page(status_to_page[status])
 
 
 def main():

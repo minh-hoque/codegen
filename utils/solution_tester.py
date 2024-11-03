@@ -19,7 +19,7 @@ from questions_py.types import (
 class TestResult:
     passed: bool
     execution_time: float
-    error_message: Optional[str] = None
+    message: str
     expected_output: Any = None
     actual_output: Any = None
 
@@ -74,23 +74,43 @@ class SolutionTester:
             actual_output = self.solution_func(**input_dict)
             execution_time = time.time() - start_time
 
+            message = (
+                f"Test case {test_number}:\n"
+                f"Inputs:\n"
+                + "\n".join(f"  {k} = {v}" for k, v in input_dict.items())
+                + f"\nExpected output: {expected_output}\n"
+                f"Actual output: {actual_output}"
+            )
+
             if actual_output == expected_output:
-                return TestResult(passed=True, execution_time=execution_time)
+                return TestResult(
+                    passed=True,
+                    execution_time=execution_time,
+                    message=message,
+                    expected_output=expected_output,
+                    actual_output=actual_output,
+                )
             else:
                 return TestResult(
                     passed=False,
                     execution_time=execution_time,
-                    error_message=f"Test case {test_number}: Output mismatch",
+                    message=message,
                     expected_output=expected_output,
                     actual_output=actual_output,
                 )
 
         except Exception as e:
             execution_time = time.time() - start_time
+            message = (
+                f"Test case {test_number} failed with error:\n"
+                f"Inputs:\n"
+                + "\n".join(f"  {k} = {v}" for k, v in input_dict.items())
+                + f"\n\nError: {str(e)}\n{traceback.format_exc()}"
+            )
             return TestResult(
                 passed=False,
                 execution_time=execution_time,
-                error_message=f"Test case {test_number} failed with error:\n{str(e)}\n{traceback.format_exc()}",
+                message=message,
             )
 
     def print_results(self) -> None:
@@ -102,14 +122,8 @@ class SolutionTester:
             print(f"\nTest Case {i}:")
             print(f"Status: {'✅ PASSED' if result.passed else '❌ FAILED'}")
             print(f"Execution Time: {result.execution_time:.4f} seconds")
-
-            if not result.passed:
-                print("Error Details:")
-                if result.error_message:
-                    print(f"  {result.error_message}")
-                if result.expected_output is not None:
-                    print(f"  Expected: {result.expected_output}")
-                    print(f"  Got: {result.actual_output}")
+            print("Details:")
+            print(f"  {result.message}")
 
         total_passed = sum(1 for r in self.results if r.passed)
         print("\nSummary:")

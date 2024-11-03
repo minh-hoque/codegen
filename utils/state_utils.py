@@ -87,11 +87,22 @@ def resume_question(question_id: str) -> bool:
     if not question:
         return False
 
+    # Clear existing state first
+    clear_session_state()
+
     # Restore all state from saved question
     for key, value in question.items():
         if key != "id":
             st.session_state[key] = value
     st.session_state.current_question_id = question_id
+
+    # Set completion flags based on status
+    if question.get("status") == "completed":
+        st.session_state.debug_completed = True
+        st.session_state.format_completed = True
+        st.session_state.solve_completed = True
+        st.session_state.review_completed = True
+
     return True
 
 

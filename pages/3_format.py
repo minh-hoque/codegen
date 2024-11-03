@@ -57,7 +57,7 @@ def render_format_page():
 
                     try:
                         filepath = save_challenge_file(cleaned_solution)
-                        set_state_value("formatted_solution", cleaned_solution)
+                        set_state_value("saved_solution", cleaned_solution)
                         set_state_value("challenge_file", filepath)
                         save_progress()
                         st.success(f"Solution saved to {filepath}")
@@ -68,7 +68,7 @@ def render_format_page():
 
         with col2:
             if st.button("Proceed to Debug"):
-                if "formatted_solution" in st.session_state:
+                if "saved_solution" in st.session_state:
                     st.switch_page("pages/4_debug.py")
                 else:
                     st.error("Please save the solution before proceeding")

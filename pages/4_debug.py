@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.openai_utils import init_openai
+from utils.openai_utils import init_openai, debug_solution
 from utils.state_utils import (
     initialize_session_state,
     get_state_value,
@@ -10,6 +10,8 @@ from utils.progress_utils import sidebar_progress
 from utils.solution_tester import SolutionTester
 from pathlib import Path
 import os
+from utils.prompts import DEBUG_SOLUTION_PROMPT
+import re
 
 
 def render_debug_page():
@@ -22,33 +24,38 @@ def render_debug_page():
 
     client = init_openai()
 
-    formatted_solution = get_state_value("formatted_solution")
+    saved_solution = get_state_value("saved_solution")
     challenge_file = get_state_value("challenge_file")
 
-    if not formatted_solution or not challenge_file:
+    if not saved_solution or not challenge_file:
         st.warning("Please format the solution first.")
         if st.button("Go to Format Step"):
             st.switch_page("pages/3_format.py")
         return
 
+    # Load current solution from file and update state
+    try:
+        challenge_path = Path(challenge_file)
+        if challenge_path.exists():
+            with open(challenge_path, "r") as f:
+                current_solution = f.read()
+                # Update state with current file contents
+                set_state_value("saved_solution", current_solution)
+                saved_solution = current_solution
+    except Exception as e:
+        st.error(f"Error reading solution file: {str(e)}")
+        return
+
     st.markdown("### Debug Solution")
     st.markdown(f"Solution file: `{challenge_file}`")
-    st.code(formatted_solution, language="python")
+    st.code(saved_solution, language="python")
 
     # Add debug controls
     if st.button("Run Tests"):
         with st.spinner("Running tests..."):
             try:
-                # Create a temporary file with the formatted solution
-                temp_dir = Path("temp")
-                temp_dir.mkdir(exist_ok=True)
-                temp_file = temp_dir / os.path.basename(str(challenge_file))
-
-                with open(temp_file, "w") as f:
-                    f.write(formatted_solution)
-
-                # Initialize and run the solution tester
-                tester = SolutionTester.from_challenge_file(temp_file)
+                # Initialize and run the solution tester directly with the challenge file
+                tester = SolutionTester.from_challenge_file(challenge_path)
                 results = tester.run_all_tests()
 
                 # Display results
@@ -70,17 +77,12 @@ def render_debug_page():
                         f"Test Case {i}: {'✅ PASSED' if result.passed else '❌ FAILED'}"
                     ):
                         st.text(f"Execution Time: {result.execution_time:.4f} seconds")
-                        if not result.passed:
-                            st.error("Error Details:")
-                            if result.error_message:
-                                st.code(result.error_message)
-                            if result.expected_output is not None:
-                                st.text(f"Expected: {result.expected_output}")
-                                st.text(f"Got: {result.actual_output}")
+                        st.text("Test Details:")
+                        st.code(result.message)
 
                 # Clean up temporary file
-                if temp_file.exists():
-                    temp_file.unlink()
+                if challenge_path.exists():
+                    challenge_path.unlink()
 
                 save_progress()  # Save progress after running tests
 
@@ -91,8 +93,69 @@ def render_debug_page():
             except Exception as e:
                 st.error(f"Error running tests: {str(e)}")
                 # Clean up temporary file in case of error
-                if "temp_file" in locals() and temp_file.exists():
-                    temp_file.unlink()
+                if "challenge_path" in locals() and challenge_path.exists():
+                    challenge_path.unlink()
+
+    # Add AI Debug Assistant button
+    if st.button("Get AI Debug Help"):
+        with st.spinner("Analyzing solution with AI..."):
+            try:
+
+                # Format failed test results if they exist
+                failed_tests = ""
+                if "results" in locals():
+                    failed_tests = "\n".join(
+                        [
+                            f"Test Case {i+1}:\n"
+                            f"Expected: {result.expected_output}\n"
+                            f"Got: {result.actual_output}\n"
+                            f"Error: {result.message}\n"
+                            for i, result in enumerate(results)
+                            if not result.passed
+                        ]
+                    )
+                else:
+                    failed_tests = (
+                        "No test results available yet. Please run tests first."
+                    )
+
+                # Get AI debugging suggestions
+                debug_response = debug_solution(client, saved_solution, failed_tests)
+
+                # Store debug response in session state
+                set_state_value("debug_response", debug_response)
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"Error getting AI debug help: {str(e)}")
+
+    # Display debug suggestions if they exist
+    debug_response = get_state_value("debug_response")
+    if debug_response:
+        if debug_response["status"] == "error":
+            st.error(f"Error getting AI debug help: {debug_response['generated_text']}")
+        else:
+            # Display AI suggestions
+            st.subheader("AI Debug Suggestions")
+            suggestions = debug_response["generated_text"]
+            st.markdown(suggestions)
+
+            # Look for code blocks in the response
+            code_blocks = re.findall(r"```python\n(.*?)```", suggestions, re.DOTALL)
+
+            if code_blocks:
+                st.subheader("Suggested Fixed Solution")
+                fixed_solution = code_blocks[0].strip()
+                st.code(fixed_solution, language="python")
+
+                # Allow user to apply the fix
+                if st.button("Apply Suggested Fix"):
+                    set_state_value("saved_solution", fixed_solution)
+                    set_state_value("debug_response", None)  # Clear the debug response
+                    st.success(
+                        "Solution updated! You can now run the tests again to verify the fix."
+                    )
+                    st.rerun()
 
     if st.button("Proceed to Review"):
         set_state_value("debug_completed", True)  # Mark debug step as completed

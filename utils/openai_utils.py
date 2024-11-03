@@ -6,6 +6,8 @@ from utils.prompts import (
     VALIDATE_TESTS_PROMPT,
     SOLVE_SOLUTION_PROMPT,
     FORMAT_PROMPT,
+    DEBUG_SOLUTION_PROMPT,
+    REVIEW_SOLUTION_PROMPT,
 )
 
 
@@ -100,4 +102,58 @@ def format_solution(
         prompt=prompt,
         model="gpt-4o",
         temperature=0,
+    )
+
+
+@st.cache_data(ttl=3600)
+def debug_solution(
+    _client: Optional[OpenAI],
+    solution: str,
+    failed_tests: str,
+    model: str = "o1-preview",
+    temperature: float = 1,
+) -> Dict[str, Any]:
+    """Get debugging suggestions for a solution using OpenAI."""
+    if not _client:
+        return {"generated_text": "OpenAI client not initialized", "status": "error"}
+
+    prompt = DEBUG_SOLUTION_PROMPT.format(
+        solution=solution, failed_unit_tests=failed_tests
+    )
+
+    return query_openai(
+        _client=_client, prompt=prompt, model=model, temperature=temperature
+    )
+
+
+@st.cache_data(ttl=3600)
+def get_completion(
+    _client: Optional[OpenAI],
+    prompt: str,
+    model: str = "gpt-4o",
+    temperature: float = 0,
+) -> Dict[str, Any]:
+    """Generic completion function for review and other prompts"""
+    if not _client:
+        return {"generated_text": "OpenAI client not initialized", "status": "error"}
+
+    return query_openai(
+        _client=_client, prompt=prompt, model=model, temperature=temperature
+    )
+
+
+@st.cache_data(ttl=3600)
+def review_solution(
+    _client: Optional[OpenAI],
+    solution_text: str,
+    model: str = "gpt-4o",
+    temperature: float = 0,
+) -> Dict[str, Any]:
+    """Get AI review of the solution using the REVIEW_SOLUTION_PROMPT"""
+    if not _client:
+        return {"generated_text": "OpenAI client not initialized", "status": "error"}
+
+    prompt = REVIEW_SOLUTION_PROMPT.format(solution=solution_text)
+    return query_openai(
+        _client=_client, prompt=prompt, model=model, temperature=temperature
     )

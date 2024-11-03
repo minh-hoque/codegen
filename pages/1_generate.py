@@ -2,7 +2,7 @@ import streamlit as st
 import uuid
 from utils.openai_utils import init_openai, generate_question, validate_unit_tests
 from utils.state_utils import initialize_session_state, set_state_value, save_progress
-from utils.constants import PROBLEM_CATEGORIES
+from utils.constants import LEETCODE_CATEGORY_MAP
 from utils.progress_utils import sidebar_progress
 
 
@@ -21,7 +21,7 @@ def render_generate_page():
     # Category selection
     categories = st.multiselect(
         "Select Problem Categories (1-3)",
-        options=list(PROBLEM_CATEGORIES.values()),
+        options=list(LEETCODE_CATEGORY_MAP.keys()),
         max_selections=3,
     )
 
@@ -30,7 +30,10 @@ def render_generate_page():
             st.error("Please select between 1-3 categories")
         else:
             with st.spinner("Generating question..."):
-                result = generate_question(client, categories)
+                category_values = [
+                    LEETCODE_CATEGORY_MAP[category] for category in categories
+                ]
+                result = generate_question(client, category_values)
                 if result and result["status"] == "success":
                     set_state_value("current_question_id", str(uuid.uuid4()))
                     set_state_value("generated_text", result["generated_text"])

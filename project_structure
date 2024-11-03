@@ -1,14 +1,24 @@
-your_project/
-├── pages/
-│   ├── 1_generate.py
-│   ├── 2_solve.py
-│   ├── 3_format.py
-│   ├── 4_debug.py
-│   └── 5_review.py
-├── generate_questions.py  # becomes the main entry point/home page
-├── utils/
-│   ├── __init__.py
-│   ├── openai_utils.py   # OpenAI related functions
-│   ├── prompts.py        # All prompt templates
-│   └── state_utils.py    # Session state management helpers
-└── config.py 
+.
+├── CodeGen.py                      # Main application entry point
+├── challenges/                     # Directory containing coding challenge implementations
+│   └── coding_challenge_01.py      # First coding challenge implementation
+├── data/                          # Directory for storing application data
+│   └── questions.json             # JSON file containing coding questions and metadata
+├── pages/                         # Streamlit pages for different sections of the app
+│   ├── 1_generate.py             # Page for generating new coding questions
+│   ├── 2_solve.py                # Page for solving coding questions
+│   ├── 3_debug.py                # Page for debugging solutions
+│   ├── 4_format.py               # Page for formatting solutions
+│   └── 5_review.py               # Page for reviewing and validating solutions
+├── questions_py/                  # Package for question-related type definitions
+│   └── types.py                  # Type definitions for questions, metadata, and tests
+└── utils/                        # Utility modules for various functionalities
+    ├── components.py             # Reusable UI components for Streamlit
+    ├── constants.py              # Application-wide constants and configurations
+    ├── db_utils.py              # Database interaction utilities
+    ├── file_utils.py            # File handling utilities
+    ├── openai_utils.py          # OpenAI API interaction utilities
+    ├── progress_utils.py        # Progress tracking and management utilities
+    ├── prompts.py              # Templates for OpenAI API prompts
+    ├── solution_tester.py       # Utilities for testing coding solutions
+    └── state_utils.py          # State management utilities for Streamlit 

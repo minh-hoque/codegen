@@ -20,14 +20,26 @@ def initialize_session_state():
         st.session_state.solution = None
     if "formatted_text" not in st.session_state:
         st.session_state.formatted_text = None
-    if "formatted_solution" not in st.session_state:
-        st.session_state.formatted_solution = None
+    if "saved_solution" not in st.session_state:
+        st.session_state.saved_solution = None
     if "challenge_file" not in st.session_state:
         st.session_state.challenge_file = None
     if "current_question_id" not in st.session_state:
         st.session_state.current_question_id = None
     if "db" not in st.session_state:
         st.session_state.db = JsonDB()
+    if "debug_response" not in st.session_state:
+        st.session_state.debug_response = None
+    if "generate_completed" not in st.session_state:
+        st.session_state.generate_completed = False
+    if "solve_completed" not in st.session_state:
+        st.session_state.solve_completed = False
+    if "format_completed" not in st.session_state:
+        st.session_state.format_completed = False
+    if "debug_completed" not in st.session_state:
+        st.session_state.debug_completed = False
+    if "review_completed" not in st.session_state:
+        st.session_state.review_completed = False
 
 
 def get_state_value(key: str) -> Optional[Any]:
@@ -49,13 +61,22 @@ def save_progress():
     db = st.session_state.db
     current_state = {
         "id": st.session_state.current_question_id,
-        "categories": st.session_state.get("selected_categories", []),
-        "generated_text": st.session_state.get("generated_text"),
-        "generated_question": st.session_state.get("generated_question"),
-        "test_validation": st.session_state.get("test_validation"),
-        "solution": st.session_state.get("solution"),
-        "formatted_solution": st.session_state.get("formatted_solution"),
-        "challenge_file": st.session_state.get("challenge_file"),
+        "categories": st.session_state.get("selected_categories", []),  # generate step
+        "generated_text": st.session_state.get("generated_text"),  # generate step
+        "generated_question": st.session_state.get(
+            "generated_question"
+        ),  # generate step
+        "test_validation": st.session_state.get("test_validation"),  # generate step
+        "solution": st.session_state.get("solution"),  # solve step
+        "formatted_text": st.session_state.get("formatted_text"),  # format step
+        "saved_solution": st.session_state.get("saved_solution"),  # format step
+        "challenge_file": st.session_state.get("challenge_file"),  # format step
+        "debug_response": st.session_state.get("debug_response"),  # debug step
+        "generate_completed": st.session_state.get("generate_completed", False),
+        "solve_completed": st.session_state.get("solve_completed", False),
+        "format_completed": st.session_state.get("format_completed", False),
+        "debug_completed": st.session_state.get("debug_completed", False),
+        "review_completed": st.session_state.get("review_completed", False),
         "status": get_current_status(),
     }
 
@@ -63,17 +84,17 @@ def save_progress():
 
 
 def get_current_status() -> str:
-    """Determine current progress status"""
-    if st.session_state.get("challenge_file"):
+    """Determine current progress status based on completion flags"""
+    if st.session_state.get("review_completed"):
         return "completed"
-    elif st.session_state.get("formatted_solution"):
-        return "debugging"
-    elif st.session_state.get("solution"):
-        return "formatting"
-    elif st.session_state.get("generated_question"):
-        return "solving"
-    elif st.session_state.get("generated_text"):
+    elif st.session_state.get("debug_completed"):
         return "reviewing"
+    elif st.session_state.get("format_completed"):
+        return "debugging"
+    elif st.session_state.get("solve_completed"):
+        return "formatting"
+    elif st.session_state.get("generate_completed"):
+        return "solving"
     else:
         return "started"
 
@@ -116,10 +137,16 @@ def clear_session_state():
         "solution_text",
         "solution",
         "formatted_text",
-        "formatted_solution",
+        "saved_solution",
         "challenge_file",
         "current_question_id",
         "selected_categories",
+        "debug_response",
+        "generate_completed",
+        "solve_completed",
+        "format_completed",
+        "debug_completed",
+        "review_completed",
     ]
     for key in keys_to_clear:
         if key in st.session_state:

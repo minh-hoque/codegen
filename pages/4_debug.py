@@ -80,10 +80,6 @@ def render_debug_page():
                         st.text("Test Details:")
                         st.code(result.message)
 
-                # Clean up temporary file
-                if challenge_path.exists():
-                    challenge_path.unlink()
-
                 save_progress()  # Save progress after running tests
 
                 # If all tests pass, enable the proceed button
@@ -92,9 +88,6 @@ def render_debug_page():
 
             except Exception as e:
                 st.error(f"Error running tests: {str(e)}")
-                # Clean up temporary file in case of error
-                if "challenge_path" in locals() and challenge_path.exists():
-                    challenge_path.unlink()
 
     # Add AI Debug Assistant button
     if st.button("Get AI Debug Help"):

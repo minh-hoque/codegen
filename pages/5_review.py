@@ -102,6 +102,10 @@ def render_review_page():
                 )
                 if review_result:
                     st.markdown(review_result)
+                    set_state_value(
+                        "review_completed", True
+                    )  # Mark review step as completed
+                    save_progress()
             except Exception as e:
                 st.error(f"Error getting solution review: {str(e)}")
 
@@ -142,6 +146,10 @@ This problem was generated and reviewed using an AI-assisted process.
         mime="text/plain",
     ):
         st.success("Package exported successfully!")
+        set_state_value(
+            "review_completed", True
+        )  # Mark review step as completed when exporting
+        save_progress()
 
 
 if __name__ == "__main__":

@@ -59,6 +59,9 @@ def render_format_page():
                         filepath = save_challenge_file(cleaned_solution)
                         set_state_value("saved_solution", cleaned_solution)
                         set_state_value("challenge_file", filepath)
+                        set_state_value(
+                            "format_completed", True
+                        )  # Mark format step as completed
                         save_progress()
                         st.success(f"Solution saved to {filepath}")
                     except Exception as e:

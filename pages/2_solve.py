@@ -62,6 +62,7 @@ def render_solve_page():
         with col2:
             if st.button("Save and Proceed to Format"):
                 set_state_value("solution", edited_solution)
+                set_state_value("solve_completed", True)  # Mark solve step as completed
                 save_progress()
                 st.switch_page("pages/3_format.py")
 

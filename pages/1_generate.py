@@ -78,6 +78,8 @@ def render_generate_page():
                         "generated_question_validation",
                         st.session_state.test_validation,
                     )
+                set_state_value("generate_completed", True)
+                save_progress()
                 st.switch_page("pages/2_solve.py")
 
 

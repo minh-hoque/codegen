@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.state_utils import get_current_status
 
 
 def sidebar_progress():
@@ -13,20 +14,22 @@ def sidebar_progress():
         "Review": "Review and finalize",
     }
 
-    # Determine current step based on state
-    current_index = 0
-    if st.session_state.get("challenge_file"):
-        current_index = 4  # Review
-    elif st.session_state.get("formatted_solution"):
-        current_index = 3  # Debug
-    elif st.session_state.get("solution"):
-        current_index = 2  # Format
-    elif st.session_state.get("generated_question"):
-        current_index = 1  # Solve
-    elif st.session_state.get("generated_text"):
-        current_index = 0  # Generate
+    # Map status to step index
+    status_to_step = {
+        "started": 0,  # Generate
+        "solving": 1,  # Solve
+        "formatting": 2,  # Format
+        "debugging": 3,  # Debug
+        "reviewing": 4,  # Review
+        "completed": 5,  # Completed (now using 5 to show full progress)
+    }
 
-    current_step = list(steps.keys())[current_index]
+    current_status = get_current_status()
+    current_index = status_to_step.get(current_status, 0)
+
+    # Adjust the current step display to stay within bounds
+    display_index = min(current_index, len(steps) - 1)
+    current_step = list(steps.keys())[display_index]
 
     # Show current step
     st.sidebar.markdown("### Current Step")
@@ -36,8 +39,12 @@ def sidebar_progress():
     st.sidebar.markdown("### Step Description")
     st.sidebar.markdown(steps[current_step])
 
-    # Show progress
-    progress = (current_index + 1) / len(steps)
+    # Calculate progress (now using current_index directly)
+    progress = current_index / 5  # Using 5 as denominator for 100% completion
     st.sidebar.progress(progress)
+
+    # Show completion status if completed
+    if current_status == "completed":
+        st.sidebar.success("✅ All steps completed!")
 
     return current_step

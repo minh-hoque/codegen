@@ -1,6 +1,11 @@
 import streamlit as st
 import uuid
-from utils.openai_utils import init_openai, generate_question, validate_unit_tests
+from utils.openai_utils import (
+    init_openai,
+    generate_question,
+    validate_unit_tests,
+    refine_problem,
+)
 from utils.state_utils import initialize_session_state, set_state_value, save_progress
 from utils.constants import LEETCODE_CATEGORY_MAP
 from utils.progress_utils import sidebar_progress
@@ -33,12 +38,31 @@ def render_generate_page():
                 category_values = [
                     LEETCODE_CATEGORY_MAP[category] for category in categories
                 ]
-                result = generate_question(client, category_values)
-                if result and result["status"] == "success":
-                    set_state_value("current_question_id", str(uuid.uuid4()))
-                    set_state_value("generated_text", result["generated_text"])
-                    set_state_value("selected_categories", categories)
-                    save_progress()
+                # Initial generation
+                initial_result = generate_question(client, category_values)
+
+                if initial_result and initial_result["status"] == "success":
+                    # Refine the generated problem
+                    with st.spinner("Refining question..."):
+                        refined_result = refine_problem(
+                            client, initial_result["generated_text"]
+                        )
+
+                        if refined_result and refined_result["status"] == "success":
+                            result = refined_result  # Use the refined version
+                            set_state_value("current_question_id", str(uuid.uuid4()))
+                            set_state_value("generated_text", result["generated_text"])
+                            set_state_value("selected_categories", categories)
+                            save_progress()
+                        else:
+                            st.warning(
+                                "Failed to refine question. Using initial version."
+                            )
+                            result = initial_result  # Fallback to initial version
+                            set_state_value("current_question_id", str(uuid.uuid4()))
+                            set_state_value("generated_text", result["generated_text"])
+                            set_state_value("selected_categories", categories)
+                            save_progress()
                 else:
                     st.warning("Failed to generate question. Please try again.")
 

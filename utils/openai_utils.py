@@ -8,6 +8,7 @@ from utils.prompts import (
     FORMAT_PROMPT,
     DEBUG_SOLUTION_PROMPT,
     REVIEW_SOLUTION_PROMPT,
+    REFINE_PROMPT,
 )
 
 
@@ -79,12 +80,12 @@ def validate_unit_tests(
 
 
 @st.cache_data(ttl=3600)
-def solve_problem(_client: Optional[OpenAI], draft_solution: str) -> Dict[str, Any]:
+def solve_problem(_client: Optional[OpenAI], problem_statement: str) -> Dict[str, Any]:
     """Use OpenAI to solve the coding problem"""
     if not _client:
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
-    prompt = SOLVE_SOLUTION_PROMPT.format(draft_solution=draft_solution)
+    prompt = SOLVE_SOLUTION_PROMPT.format(problem_statement=problem_statement)
     return query_openai(_client, prompt, model="o1-preview", temperature=1.0)
 
 
@@ -157,3 +158,61 @@ def review_solution(
     return query_openai(
         _client=_client, prompt=prompt, model=model, temperature=temperature
     )
+
+
+@st.cache_data(ttl=3600)
+def analyze_problem_similarity(
+    _client: Optional[OpenAI],
+    original_problem: str,
+    found_problems: List[str],
+    model: str = "gpt-4o",
+    temperature: float = 0,
+) -> Dict[str, Any]:
+    """
+    Analyze similarity between original problem and found LeetCode problems.
+
+    Args:
+        _client: OpenAI client instance
+        original_problem: The original problem statement
+        found_problems: List of found LeetCode problem titles
+        model: OpenAI model to use
+        temperature: Temperature parameter for generation
+
+    Returns:
+        Dict containing generated analysis and status
+    """
+    if not _client:
+        return {"generated_text": "OpenAI client not initialized", "status": "error"}
+
+    similarity_prompt = f"""Your task is to analyze the similarity between the original problem statement and the found LeetCode problems.
+    Compare the following problem statement with the found LeetCode problems and assess their similarity:
+    
+    Original Problem:
+    {original_problem}
+    
+    Found LeetCode Problems:
+    {found_problems}
+    
+    Please analyze:
+    1. Is the original problem too similar to the found problems? 
+    2. Which LeetCode problems are most similar to the original problem?
+    """
+
+    return query_openai(
+        _client=_client, prompt=similarity_prompt, model=model, temperature=temperature
+    )
+
+
+@st.cache_data(ttl=3600)
+def refine_problem(
+    _client: Optional[OpenAI],
+    problem_text: str,
+    model: str = "gpt-4o",
+    temperature: float = 0,
+) -> Dict[str, Any]:
+    """Refine and improve the quality of the generated problem."""
+    if not _client or not problem_text:
+        return {"generated_text": "Invalid input", "status": "error"}
+
+    prompt = REFINE_PROMPT.format(problem_text=problem_text)
+    return query_openai(_client, prompt, model=model, temperature=temperature)

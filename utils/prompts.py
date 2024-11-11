@@ -25,7 +25,7 @@ Each coding problem should have the following components, specified and submitte
 - Explain step by step how the unit tests are correct and why the solution is correct
 
 ### Requirements
-####Problem statement
+#### Problem statement
 - The problem statement describes a coding problem that is solvable with a self-contained, fully-executable code artifact.
 - The problem statement describes a coding problem with a solution that is checkable by a reasonable number of unit tests.
 - The problem statement describes a coding problem in a language agnostic way.
@@ -39,7 +39,7 @@ Each coding problem should have the following components, specified and submitte
 	- As an author: if in doubt, you can include a reference to a problem that you think is similar and ask the reviewer to confirm that the overlap is not too great.
  - The problem statement should be of the coding category {selected_category}
 
-#### Input/output spec
+#### Metadata
 - Variable names should be generic and concise. Examples: “n” or “n_cities”.
 - Variable descriptions should be concise. They should be capitalized and end in a period. Example: “The number of cities.”
 - Constraints should be concise, using notation from the problem statement as needed. Example: “1 <= n <= 200000”.
@@ -95,17 +95,66 @@ The Output format should follow:
 **Golden unit tests**:
 """
 
-SOLVE_SOLUTION_PROMPT = """Check if the following solution and unit tests are correct to solve the problem statement. The solution should be an approximately time- and space-optimal solution and it should have high-quality comments. The coding problem should be LEETCODE Medium or Hard level. If it is not, make it more complex.
-If the problem statement, solution or unit tests are not correct, fix them.
+REFINE_PROMPT = """Your task is to refine and improve a coding problem to make it clearer and higher quality than typical LeetCode questions. The problem should be unambiguous and engaging for coders.
 
 ### Instructions
-**Correct solution**:
-- Should be an approximately time- and space-optimal solution. If there is no single solution that is both time- and space-optimal, use your best judgment.
+1. Analyze the given problem statement, metadata, and unit tests
+2. Improve the clarity and quality by:
+   - Making the problem statement more precise and clear
+   - Ensuring all edge cases are clearly specified
+   - Adding helpful examples where needed
+   - Making constraints explicit and well-justified
+   - Ensuring unit tests cover all important cases
+3. Maintain the same core problem and difficulty level
+4. Keep the format consistent with the original
+
+### Input Problem:
+{problem_text}
+
+### Requirements for Refinement
+1. Problem Statement:
+   - Clear and unambiguous description
+   - Well-structured flow of information
+   - Explicit requirements and constraints
+   - Engaging real-world context where appropriate
+   - Better quality than typical LeetCode questions
+
+2. Metadata:
+   - Precise input/output specifications
+   - Clear and justified constraints
+   - Accurate difficulty assessment
+
+3. Unit Tests:
+   - Comprehensive coverage of edge cases
+   - Clear examples that illustrate the problem
+   - Well-explained test cases
+   - No duplicate tests
+   - No mistakes in the unit tests
+
+### Output Format
+**Problem Statement**:
+[Refined problem statement]
+
+**Metadata**:
+[Refined metadata]
+
+**Golden unit tests**:
+[Refined unit tests]
+"""
+
+
+SOLVE_SOLUTION_PROMPT = """Your task is to create a correct solution to the problem statement that passes all unit tests. The solution should be an approximately time- and space-optimal solution and it should have high-quality comments. The coding problem should be LEETCODE Medium or Hard level. If it is not, make it more complex.
+
+### Instructions
+- Read the problem statement carefully and unit tests carefully.
+- Create a correct solution to the problem statement.
+- The solution should pass all unit tests.
+- The solution should be an approximately time- and space-optimal solution. If there is no single solution that is both time- and space-optimal, use your best judgment.
 - The function implementing the correct solution should be in Python and use only standard libraries. (Note: if you feel it would be beneficial to add a common, non-standard library, please notify the organizers.)
 - The function implementing the correct solution should be type-annotated (if applicable).
+- If the problem statement or unit tests are not correct, fix them.
 
 ### Requirements
-#### Correct solution
 - The solution should be correct.
 - The solution should be an approximately time- and space-optimal solution, or the best in your judgment.
 - The function implementing the correct solution should be in Python and use only standard libraries.
@@ -231,8 +280,8 @@ Output should follow the following format:
 **Correct Solution**:
 **Golden unit tests**:
 
-### Solution
-{draft_solution}
+### Problem Statement
+{problem_statement}
 
 ### Output
 """
@@ -373,8 +422,10 @@ Output should follow the following format:
 **Correct Solution**:
 **Golden unit tests**:
 
-Solution:
-{draft_solution}
+### Problem Statement
+{problem_statement}
+
+### Output
 """
 
 DEBUG_SOLUTION_PROMPT = """Your task is to correct a python coding solution by debugging the solution and the failed unit tests.
@@ -433,7 +484,19 @@ Based on these criteria, provide a detailed review of the solution. Conclude wit
 - Rationale:
 """
 
-FORMAT_PROMPT = """Your task is to format the provided coding problem information into a standardized Python module structure. Follow the example format below, updating all sections to reflect the given problem. Make sure the function name is `solution()`.
+from questions_py.types import Category
+
+
+# Generate the categories string dynamically from the Category enum
+def _generate_categories_str() -> str:
+    categories = []
+    for category in Category:
+        categories.append(f"        Category.{category.name},  # {category.value}")
+    return "\n".join(categories)
+
+
+# Create the base prompt with dynamic categories
+FORMAT_PROMPT_TEMPLATE = """Your task is to format the provided coding problem information into a standardized Python module structure. Follow the example format below, updating all sections to reflect the given problem. Make sure the function name is `solution()`.
 
 Python Module Format:
 from typing import List, Tuple
@@ -453,11 +516,9 @@ problem_statement = \"""
 metadata = Metadata(
     statement=problem_statement,
     approx_leetcode_level=LeetcodeLevel.[MEDIUM/HARD],
-    categories=[Category.ARRAY, Category.STRING, Category.HASH_TABLE, Category.DYNAMIC_PROGRAMMING, 
-                Category.MATH, Category.SORTING, Category.GREEDY, Category.DFS, Category.DATABASE, 
-                Category.BINARY_SEARCH, Category.MATRIX, Category.TREE, Category.BFS, Category.DATACLASS, 
-                Category.BACKTRACKING, Category.SLIDING_WINDOW, Category.HEAP, Category.STACK, 
-                Category.GRAPH, Category.GEOMETRY],
+    categories=[
+{categories}
+    ],
     inputs=[
         Input(
             name="input_name",
@@ -487,6 +548,11 @@ def solution(param1: Type1, param2: Type2) -> ReturnType:
 Please format the following problem information into this structure:
 {information}
 """
+
+# Create the final prompt with dynamic categories
+FORMAT_PROMPT = FORMAT_PROMPT_TEMPLATE.format(
+    categories=_generate_categories_str(), information="{information}"
+)
 
 VALIDATE_TESTS_PROMPT = """Please validate the unit tests in the following coding problem. Analyze each test case step by step.
 

@@ -1,23 +1,32 @@
 import streamlit as st
 from utils.openai_utils import init_openai, review_solution
-from utils.state_utils import initialize_session_state, get_state_value, set_state_value
+from utils.state_utils import (
+    initialize_session_state,
+    get_state_value,
+    set_state_value,
+    save_progress,
+)
 import requests
 from bs4 import BeautifulSoup
 from utils.constants import LEETCODE_CATEGORY_MAP
 from pathlib import Path
+import os
+from utils.progress_utils import sidebar_progress
+from utils.leetcode_utils import find_similar_leetcode_problems
 
 
-def search_leetcode_similarity(question_text, category):
+def search_leetcode_similarity(question_text, category=None):
     """
-    Search for similar problems on LeetCode with category filter
+    Search for similar problems on LeetCode with optional category filter
 
     Args:
         question_text (str): The question text to search for
-        category (str): The category to filter by (e.g., 'ARRAY', 'DYNAMIC_PROGRAMMING')
+        category (str, optional): The category to filter by (e.g., 'ARRAY', 'DYNAMIC_PROGRAMMING')
     """
     try:
-        # Map our category to LeetCode's category format
-        leetcode_category = LEETCODE_CATEGORY_MAP.get(category, "")
+        print(f"Searching for similar problems for category: {category}")
+        # Map our category to LeetCode's category format if category is provided
+        leetcode_category = LEETCODE_CATEGORY_MAP.get(category, "") if category else ""
         if leetcode_category:
             # Include category in search URL
             search_url = (
@@ -60,16 +69,33 @@ def get_solution_review(solution_text):
         return None
 
 
+def save_final_challenge(challenge_text: str, question_id: str):
+    """Save the final challenge to the final_challenges directory"""
+    # Create final_challenges directory if it doesn't exist
+    final_dir = Path("final_challenges")
+    final_dir.mkdir(exist_ok=True)
+
+    # Save the challenge file with the question ID as the filename
+    challenge_path = final_dir / f"challenge_{question_id}.py"
+    with open(challenge_path, "w") as f:
+        f.write(challenge_text)
+    return challenge_path
+
+
 def render_review_page():
     st.title("Review Solution")
 
     initialize_session_state()
+
+    # Show progress in sidebar
+    sidebar_progress()
+
     client = init_openai()
 
     generated_question = get_state_value("generated_question")
     saved_solution = get_state_value("saved_solution")
     challenge_file = get_state_value("challenge_file")
-    selected_category = get_state_value("selected_category")
+    selected_categories = get_state_value("selected_category")
 
     if not saved_solution or not challenge_file:
         st.warning("Please complete all previous steps first.")
@@ -83,8 +109,8 @@ def render_review_page():
     with st.expander("View Original Question", expanded=True):
         if generated_question:
             st.markdown(generated_question)
-            if selected_category:
-                st.info(f"Category: {selected_category}")
+            if selected_categories:
+                st.info(f"Category: {selected_categories}")
 
     with st.expander("View Final Solution", expanded=True):
         st.code(saved_solution, language="python")
@@ -113,18 +139,19 @@ def render_review_page():
     st.markdown("### Similarity Check")
     if st.button("Check for Similar Problems"):
         with st.spinner("Searching for similar problems..."):
-            similar_problems = search_leetcode_similarity(
-                generated_question, selected_category
-            )
+            category = selected_categories[0] if selected_categories else None
+            similar_problems = search_leetcode_similarity(generated_question, category)
 
             if similar_problems:
                 st.markdown(
-                    f"#### Potentially Similar LeetCode {selected_category} Problems:"
+                    f"#### Potentially Similar LeetCode {category if category else ''} Problems:"
                 )
                 for title, link in similar_problems:
                     st.markdown(f"- [{title}]({link})")
             else:
-                st.info(f"No similar {selected_category} problems found on LeetCode.")
+                st.info(
+                    f"No similar {''+category if category else ''} problems found on LeetCode."
+                )
 
     # Export functionality
     st.markdown("### Export Solution")
@@ -134,7 +161,7 @@ def render_review_page():
 {generated_question or ''}
 
 # Category
-{selected_category or 'Not specified'}
+{selected_categories or 'Not specified'}
 
 # Solution
 {saved_solution or ''}
@@ -150,6 +177,68 @@ This problem was generated and reviewed using an AI-assisted process.
             "review_completed", True
         )  # Mark review step as completed when exporting
         save_progress()
+
+    # Add completion button
+    st.markdown("### Complete Challenge")
+    if st.button("Mark as Complete"):
+        if not challenge_file:
+            st.error("No challenge file found. Please complete previous steps first.")
+            return
+
+        try:
+            # Save the final challenge
+            final_path = save_final_challenge(
+                challenge_file, st.session_state.current_question_id
+            )
+
+            # Update state
+            set_state_value("status", "completed")
+            set_state_value("review_completed", True)
+            save_progress()
+
+            st.success(f"Challenge completed! Final version saved to: {final_path}")
+
+            # Show a message about where to find the file
+            st.info(
+                "You can find your completed challenge in the 'final_challenges' folder."
+            )
+
+        except Exception as e:
+            st.error(f"Error completing challenge: {str(e)}")
+
+    if st.button("Find Similar LeetCode Problems"):
+        with st.spinner("Searching for similar problems..."):
+            # Read problem statement from challenge file
+            try:
+                with open(challenge_file, "r") as f:
+                    file_contents = f.read()
+                    # Extract problem statement from the challenge file
+                    # Assuming the problem statement is stored in a variable named problem_statement
+                    problem_statement = None
+                    exec_globals = {}
+                    exec(file_contents, exec_globals)
+                    problem_statement = exec_globals.get("problem_statement")
+
+                    st.write(problem_statement)
+                    if problem_statement:
+                        results = find_similar_leetcode_problems(problem_statement)
+                        st.write(results)
+                        st.session_state.similar_problems = results["similar_problems"]
+                        st.session_state.similarity_analysis = results[
+                            "similarity_analysis"
+                        ]
+                    else:
+                        st.error("Could not find problem statement in challenge file")
+            except Exception as e:
+                st.error(f"Error reading challenge file: {str(e)}")
+
+    if st.session_state.similar_problems:
+        st.subheader("Similar LeetCode Problems")
+        for problem in st.session_state.similar_problems:
+            st.markdown(f"- [{problem['title']}]({problem['url']})")
+
+        st.subheader("Similarity Analysis")
+        st.write(st.session_state.similarity_analysis)
 
 
 if __name__ == "__main__":

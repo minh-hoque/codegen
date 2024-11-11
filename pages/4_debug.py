@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.openai_utils import init_openai, debug_solution
+from utils.openai_utils import init_openai, debug_solution, format_solution
 from utils.state_utils import (
     initialize_session_state,
     get_state_value,
@@ -8,6 +8,7 @@ from utils.state_utils import (
 )
 from utils.progress_utils import sidebar_progress
 from utils.solution_tester import SolutionTester
+from utils.text_utils import clean_code_block
 from pathlib import Path
 import os
 from utils.prompts import DEBUG_SOLUTION_PROMPT
@@ -124,6 +125,7 @@ def render_debug_page():
 
     # Display debug suggestions if they exist
     debug_response = get_state_value("debug_response")
+    saved_solution = get_state_value("saved_solution")
     if debug_response:
         if debug_response["status"] == "error":
             st.error(f"Error getting AI debug help: {debug_response['generated_text']}")
@@ -133,22 +135,44 @@ def render_debug_page():
             suggestions = debug_response["generated_text"]
             st.markdown(suggestions)
 
-            # Look for code blocks in the response
-            code_blocks = re.findall(r"```python\n(.*?)```", suggestions, re.DOTALL)
+            # Format the suggestions
+            formatted_result = format_solution(
+                client,
+                (saved_solution or "")
+                + "\n\n"
+                + (suggestions or ""),  # Handle None values
+            )
+            if formatted_result["status"] == "success":
+                formatted_suggestions = formatted_result["generated_text"]
+
+                # Look for code blocks in the formatted response
+                code_blocks = clean_code_block(formatted_suggestions)
+            else:
+                st.error("Failed to format debug suggestions")
+                return
 
             if code_blocks:
                 st.subheader("Suggested Fixed Solution")
-                fixed_solution = code_blocks[0].strip()
+                fixed_solution = code_blocks.strip()
                 st.code(fixed_solution, language="python")
 
                 # Allow user to apply the fix
                 if st.button("Apply Suggested Fix"):
-                    set_state_value("saved_solution", fixed_solution)
-                    set_state_value("debug_response", None)  # Clear the debug response
-                    st.success(
-                        "Solution updated! You can now run the tests again to verify the fix."
-                    )
-                    st.rerun()
+                    try:
+                        # Save the fixed solution to the challenge file
+                        with open(challenge_path, "w") as f:
+                            f.write(fixed_solution)
+
+                        set_state_value("saved_solution", fixed_solution)
+                        set_state_value(
+                            "debug_response", None
+                        )  # Clear the debug response
+                        st.success(
+                            "Solution updated and saved! You can now run the tests again to verify the fix."
+                        )
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error saving fixed solution: {str(e)}")
 
     if st.button("Proceed to Review"):
         set_state_value("debug_completed", True)  # Mark debug step as completed

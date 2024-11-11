@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any
 import streamlit as st
 from utils.db_utils import JsonDB
 import uuid
+from utils.leetcode_utils import find_similar_leetcode_problems
 
 
 def initialize_session_state():
@@ -40,6 +41,10 @@ def initialize_session_state():
         st.session_state.debug_completed = False
     if "review_completed" not in st.session_state:
         st.session_state.review_completed = False
+    if "similar_problems" not in st.session_state:
+        st.session_state.similar_problems = None
+    if "similarity_analysis" not in st.session_state:
+        st.session_state.similarity_analysis = None
 
 
 def get_state_value(key: str) -> Optional[Any]:
@@ -61,12 +66,15 @@ def save_progress():
     db = st.session_state.db
     current_state = {
         "id": st.session_state.current_question_id,
-        "categories": st.session_state.get("selected_categories", []),  # generate step
+        "selected_category": st.session_state.get(
+            "selected_category"
+        ),  # Changed from selected_categories
         "generated_text": st.session_state.get("generated_text"),  # generate step
         "generated_question": st.session_state.get(
             "generated_question"
         ),  # generate step
         "test_validation": st.session_state.get("test_validation"),  # generate step
+        "solution_text": st.session_state.get("solution_text"),  # solve step
         "solution": st.session_state.get("solution"),  # solve step
         "formatted_text": st.session_state.get("formatted_text"),  # format step
         "saved_solution": st.session_state.get("saved_solution"),  # format step
@@ -77,6 +85,8 @@ def save_progress():
         "format_completed": st.session_state.get("format_completed", False),
         "debug_completed": st.session_state.get("debug_completed", False),
         "review_completed": st.session_state.get("review_completed", False),
+        "similar_problems": st.session_state.get("similar_problems"),
+        "similarity_analysis": st.session_state.get("similarity_analysis"),
         "status": get_current_status(),
     }
 
@@ -140,7 +150,7 @@ def clear_session_state():
         "saved_solution",
         "challenge_file",
         "current_question_id",
-        "selected_categories",
+        "selected_category",
         "debug_response",
         "generate_completed",
         "solve_completed",

@@ -12,7 +12,12 @@ from utils.constants import LEETCODE_CATEGORY_MAP
 from pathlib import Path
 import os
 from utils.progress_utils import sidebar_progress
-from utils.leetcode_utils import find_similar_leetcode_problems
+from utils.leetcode_utils import (
+    find_similar_leetcode_problems,
+    get_similar_problems_context,
+)
+from tavily import TavilyClient
+from utils.components import card
 
 
 def search_leetcode_similarity(question_text, category=None):
@@ -108,7 +113,7 @@ def render_review_page():
     # Original question and solution display
     with st.expander("View Original Question", expanded=True):
         if generated_question:
-            st.markdown(generated_question)
+            card(generated_question, "review_question_card")
             if selected_categories:
                 st.info(f"Category: {selected_categories}")
 
@@ -127,7 +132,7 @@ def render_review_page():
                     else None
                 )
                 if review_result:
-                    st.markdown(review_result)
+                    card(review_result, "review_result_card")
                     set_state_value(
                         "review_completed", True
                     )  # Mark review step as completed
@@ -152,6 +157,67 @@ def render_review_page():
                 st.info(
                     f"No similar {''+category if category else ''} problems found on LeetCode."
                 )
+
+    # Add Tavily Search Section
+    st.markdown("### Search Similar Problems Online")
+    if st.button("Search Similar Problems Online"):
+        try:
+            tavily_api_key = os.getenv("TAVILY_API_KEY")
+            if not tavily_api_key:
+                st.error("Please set your TAVILY_API_KEY in the environment variables")
+                return
+
+            tavily_client = TavilyClient(api_key=tavily_api_key)
+
+            with st.spinner(
+                "Searching for similar problems across coding platforms..."
+            ):
+                # Get the problem statement from the challenge file
+                if not challenge_file:
+                    st.warning("No challenge file found")
+                    return
+
+                try:
+                    with open(challenge_file, "r") as f:
+                        file_contents = f.read()
+                        # Extract problem statement from the challenge file
+                        exec_globals = {}
+                        exec(file_contents, exec_globals)
+                        problem_statement = exec_globals.get("problem_statement")
+
+                        if not problem_statement:
+                            st.warning(
+                                "Could not find problem statement in challenge file"
+                            )
+                            return
+
+                        search_results = get_similar_problems_context(
+                            problem_statement, tavily_client
+                        )
+
+                        if search_results:
+                            st.markdown("#### Similar Problems Found:")
+                            for idx, result in enumerate(search_results, 1):
+                                with st.expander(
+                                    f"Result {idx}: {result['url']}", expanded=False
+                                ):
+                                    st.markdown(
+                                        f"**Source:** [{result['url']}]({result['url']})"
+                                    )
+                                    st.markdown("**Content Preview:**")
+                                    st.markdown(
+                                        result["content"][:500] + "..."
+                                        if len(result["content"]) > 500
+                                        else result["content"]
+                                    )
+                        else:
+                            st.info("No similar problems found")
+
+                except Exception as e:
+                    st.error(f"Error reading challenge file: {str(e)}")
+
+        except Exception as e:
+            st.error(f"Error during search: {str(e)}")
 
     # Export functionality
     st.markdown("### Export Solution")

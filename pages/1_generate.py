@@ -9,6 +9,7 @@ from utils.openai_utils import (
 from utils.state_utils import initialize_session_state, set_state_value, save_progress
 from utils.constants import LEETCODE_CATEGORY_MAP
 from utils.progress_utils import sidebar_progress
+from utils.components import card
 
 
 def render_generate_page():
@@ -70,7 +71,7 @@ def render_generate_page():
     generated_text = st.session_state.get("generated_text")
     if generated_text:
         st.markdown("### Generated Question")
-        st.markdown(generated_text)
+        card(generated_text, "generated_question_card")
 
         edited_question = st.text_area(
             "Review and Edit Question",
@@ -86,7 +87,7 @@ def render_generate_page():
                     validation_result = validate_unit_tests(client, edited_question)
                     if validation_result and validation_result["status"] == "success":
                         st.markdown("### Unit Tests Validation")
-                        st.markdown(validation_result["generated_text"])
+                        card(validation_result["generated_text"], "validation_card")
                         set_state_value(
                             "test_validation", validation_result["generated_text"]
                         )

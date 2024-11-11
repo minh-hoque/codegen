@@ -4,6 +4,7 @@ from utils.file_utils import save_challenge_file
 from utils.state_utils import initialize_session_state, save_progress, set_state_value
 from utils.progress_utils import sidebar_progress
 from utils.text_utils import clean_code_block
+from utils.components import card
 
 
 def render_format_page():
@@ -23,7 +24,7 @@ def render_format_page():
         return
 
     st.markdown("### Current Solution")
-    st.code(st.session_state.solution, language="python")
+    card(st.session_state.solution, "current_solution_card")
 
     if st.button("Format Solution"):
         with st.spinner("Formatting solution..."):
@@ -36,10 +37,10 @@ def render_format_page():
 
     if "formatted_text" in st.session_state and st.session_state.formatted_text:
         st.markdown("### Formatted Solution")
-        st.code(st.session_state.formatted_text, language="python")
+        cleaned_formatted_text = clean_code_block(st.session_state.formatted_text)
+        st.code(cleaned_formatted_text)
 
         # Clean the formatted text before showing in text area
-        cleaned_formatted_text = clean_code_block(st.session_state.formatted_text)
         edited_formatted_solution = st.text_area(
             "Review and Edit Formatted Solution",
             value=cleaned_formatted_text,

@@ -3,6 +3,35 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search
 from utils.openai_utils import analyze_problem_similarity, init_openai
+from tavily import TavilyClient
+import json
+import streamlit as st
+from typing import Dict, List, Any
+
+CODING_PLATFORMS = [
+    "https://leetcode.com",
+    "https://www.hackerrank.com",
+    "https://app.codesignal.com",
+    "https://www.codewars.com",
+    "https://practice.geeksforgeeks.org",
+    "https://exercism.io",
+    "https://www.interviewcake.com",
+    "https://coderbyte.com",
+    "https://www.topcoder.com",
+    "https://edabit.com",
+    "https://projecteuler.net",
+    "https://www.kaggle.com",
+    "https://a2oj.com",
+    "https://codingcompetitions.withgoogle.com",
+    "https://www.facebook.com/codingcompetitions/hacker-cup",
+    "https://binarysearch.com",
+    "https://www.codechef.com",
+    "https://www.spoj.com",
+    "https://atcoder.jp",
+    "https://codeforces.com",
+    "https://onlinejudge.org",
+    "https://cses.fi",
+]
 
 
 def find_similar_leetcode_problems(problem_statement: str) -> Dict:
@@ -71,3 +100,54 @@ def find_similar_leetcode_problems(problem_statement: str) -> Dict:
         "similar_problems": problems_info,
         "similarity_analysis": similarity_analysis,
     }
+
+
+def get_similar_problems_context(
+    problem_statement: str, tavily_client: TavilyClient
+) -> List[Dict[str, Any]]:
+    """
+    Search for similar coding problems using Tavily API
+
+    Args:
+        problem_statement (str): The problem statement to search for
+        tavily_client (TavilyClient): Initialized Tavily client
+
+    Returns:
+        List[Dict[str, Any]]: List of search results with content and URLs
+    """
+    # Truncate problem statement to avoid query length issues (400 token max)
+    truncated_query = (
+        problem_statement[:400] + "..."
+        if len(problem_statement) > 400
+        else problem_statement
+    )
+
+    try:
+        # Get search context from Tavily
+        context = tavily_client.get_search_context(
+            query=truncated_query,
+            max_tokens=8000,
+            max_results=6,
+            search_depth="advanced",
+            include_domains=CODING_PLATFORMS,
+        )
+
+        # Parse the returned context
+        search_results = []
+        retrieved_context = json.loads(json.loads(context))
+
+        for item in retrieved_context:
+            item_data = json.loads(item)
+            search_results.append(
+                {
+                    "content": item_data["content"],
+                    "url": item_data["url"],
+                    "title": item_data.get("title", "No title"),
+                }
+            )
+
+        return search_results
+
+    except Exception as e:
+        st.error(f"Error searching for similar problems: {str(e)}")
+        return []

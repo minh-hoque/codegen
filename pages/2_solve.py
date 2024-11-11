@@ -2,6 +2,7 @@ import streamlit as st
 from utils.openai_utils import init_openai, solve_problem, validate_unit_tests
 from utils.state_utils import initialize_session_state, set_state_value, save_progress
 from utils.progress_utils import sidebar_progress
+from utils.components import card
 
 
 def render_solve_page():
@@ -21,7 +22,7 @@ def render_solve_page():
         return
 
     st.markdown("### Question to Solve")
-    st.markdown(st.session_state.generated_question)
+    card(st.session_state.generated_question, "question_card")
 
     if st.button("Generate Solution"):
         with st.spinner("Generating solution..."):
@@ -34,7 +35,7 @@ def render_solve_page():
 
     if "solution_text" in st.session_state and st.session_state.solution_text:
         st.markdown("### Generated Solution")
-        st.markdown(st.session_state.solution_text)
+        card(st.session_state.solution_text, "solution_card")
 
         edited_solution = st.text_area(
             "Review and Edit Solution",
@@ -51,7 +52,7 @@ def render_solve_page():
                     )
                     if validation_result and validation_result["status"] == "success":
                         st.markdown("### Unit Tests Validation")
-                        st.markdown(validation_result["generated_text"])
+                        card(validation_result["generated_text"], "validation_card")
                         set_state_value(
                             "test_validation", validation_result["generated_text"]
                         )

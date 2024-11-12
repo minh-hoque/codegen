@@ -219,7 +219,7 @@ def render_review_page():
 
                         if problem_statement:
                             results = find_similar_leetcode_problems(problem_statement)
-                            st.write(results)
+                            # st.write(results)
                             st.session_state.similar_problems = results[
                                 "similar_problems"
                             ]
@@ -261,7 +261,7 @@ def render_review_page():
                 try:
                     # Save the final challenge
                     final_path = save_final_challenge(
-                        challenge_file, st.session_state.current_question_id
+                        challenge_content, st.session_state.current_question_id
                     )
 
                     # Update state

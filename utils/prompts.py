@@ -10,11 +10,12 @@ Each coding problem should have the following components, specified and submitte
 - The problem statement is coding language-agnostic. It should be able to be solved with any programming language.
 - The problem statement describes a creative scenario that requires the reader to interpret and map to a coding problem; see example below.
 - The required coding task can correspond to problems like those in coding competitions, or can be reflective of more real-world software engineering problems
-- The difficulty of the task should correspond roughly to either “Medium” or “Hard” Leetcode questions, and be annotated as such (see below).
+- The difficulty of the task should correspond roughly to either “Medium” or “Hard” Leetcode questions.
 - Assure that the problem statement is has all required information to solve the problem for the user.
 
 2. Metadata
-- Input/output spec: Should be stated concisely, as per example below.
+- Input/output spec: Should be stated concisely. Specify the input and output variables and their types.
+- Constraints: Contraints about the variables should be stated accurately.
 - Approximate difficulty level: Either Leetcode “Medium” or “Hard” (approximately), see above.
 - Problem Category: The category of the coding problem needs to be {selected_category}
 - Approximate time: time taken, in minutes, from creating the question to submitting it (code running, tests, etc.)
@@ -30,14 +31,10 @@ Each coding problem should have the following components, specified and submitte
 - The problem statement describes a coding problem with a solution that is checkable by a reasonable number of unit tests.
 - The problem statement describes a coding problem in a language agnostic way.
 - The problem statement describes a coding problem that corresponds roughly to the difficulty level of a Leetcode Medium or Hard problem based on the algorithms and data structures needed to solve the problem.
-	- Note that if reviewing, please confirm that it matches the annotated difficulty level. If not, please mark accordingly. In cases where you believe that it does not match the annotated difficulty level, but it is either “Medium” or “Hard”-level, please flag so the submission can still potentially be reassigned and used in that difficulty category.
 - The problem statement describes a scenario (either real-world or more creative) that requires reading comprehension and critical thinking to map to a software specification.
 - The problem statement must be correctly formatted and grammatically correct, have no misspellings, be well written, etc.
-	- Note: You can copy-paste into Microsoft Word or Google Docs and confirm no flags as a proxy for this.
 - The problem statement must not be plagiarized- i.e. it cannot be a literal copy of any existing coding challenge problem statement, or a minimally re-worded or transformed version of one.
-	- Note: It is fine if the problem statement leads to a coding challenge with a solution that is similar to existing coding challenge questions- there will naturally be some overlap here.
-	- As an author: if in doubt, you can include a reference to a problem that you think is similar and ask the reviewer to confirm that the overlap is not too great.
- - The problem statement should be of the coding category {selected_category}
+- The problem statement should be of the coding category {selected_category}
 
 #### Metadata
 - Variable names should be generic and concise. Examples: “n” or “n_cities”.
@@ -56,10 +53,14 @@ There is a legendary tale about Dragon Balls on Planet X: if one collects seven 
 
 
 **Metadata**:
+Input:
 n (int): The number of cities. Constraints: 1 <= n <= 200000
 m (int): The number of possible teleport trips. Constraints: 1 <= m <= 200000
 trips_costs (list[tuple[int, int, int]]): A list of tuples, where each tuple consists of a_i, b_i, t_i: he two cities connected by the teleport trip and the cost to use the teleporter, respectively. There are m sets of these values. Constraints: 1 <= a_i, b_i <= n, 0 <= t_i <= 10000
 c (list[int]): The city IDs of the seven Dragon Balls shown on the radar. Constraints: 1 <= c[i] <= n for each i from 1 to 7. Length 7
+
+Output:
+min_coins (int): The minimum number of coins needed to collect all seven Dragon Balls shown on the radar. If there is no way to complete this task, print -1 instead.
 
 
 **Golden unit tests**:
@@ -90,7 +91,9 @@ The Output format should follow:
 ### Output
 **Problem Statement**:
 
+
 **Metadata**:
+
 
 **Golden unit tests**:
 """
@@ -100,13 +103,20 @@ REFINE_PROMPT = """Your task is to refine and improve a coding problem to make i
 ### Instructions
 1. Analyze the given problem statement, metadata, and unit tests
 2. Improve the clarity and quality by:
-   - Making the problem statement more precise and clear
-   - Ensuring all edge cases are clearly specified
-   - Adding helpful examples where needed
-   - Making constraints explicit and well-justified
-   - Ensuring unit tests cover all important cases
+   - Making the problem statement more precise and clear.
+   - Making the problem statement require high-level reading comprehension and critical thinking.
+   - Ensuring all edge cases are clearly specified.
+   - Adding helpful examples where needed.
+   - Making constraints explicit and well-justified.
+   - Ensuring unit tests cover all important cases.
 3. Maintain the same core problem and difficulty level
-4. Keep the format consistent with the original
+4. Keep the format consistent with the original input problem
+
+### Format
+The Output format should follow:
+**Problem Statement**: A clear description of the python coding problem.
+**Metadata**: Section containing all required metadata.
+**Golden unit tests**: Section containing the golden unit tests for the python code.
 
 ### Input Problem:
 {problem_text}

@@ -151,12 +151,15 @@ def clear_session_state():
         "challenge_file",
         "current_question_id",
         "selected_category",
+        "selected_categories",
         "debug_response",
         "generate_completed",
         "solve_completed",
         "format_completed",
         "debug_completed",
         "review_completed",
+        "similar_problems",
+        "similarity_analysis",
     ]
     for key in keys_to_clear:
         if key in st.session_state:

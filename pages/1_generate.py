@@ -6,7 +6,12 @@ from utils.openai_utils import (
     validate_unit_tests,
     refine_problem,
 )
-from utils.state_utils import initialize_session_state, set_state_value, save_progress
+from utils.state_utils import (
+    initialize_session_state,
+    set_state_value,
+    save_progress,
+    clear_session_state,
+)
 from utils.constants import LEETCODE_CATEGORY_MAP
 from utils.progress_utils import sidebar_progress
 from utils.components import card
@@ -35,6 +40,9 @@ def render_generate_page():
         if len(categories) > 3:
             st.error("Please select between 1-3 categories")
         else:
+            # Clear previous session state when generating new question
+            clear_session_state()
+
             with st.spinner("Generating question..."):
                 category_values = [
                     LEETCODE_CATEGORY_MAP[category] for category in categories

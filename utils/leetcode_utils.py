@@ -50,8 +50,8 @@ def find_similar_leetcode_problems(problem_statement: str) -> Dict:
 
     # Search query formation
     search_query = f"leetcode {' '.join(problem_statement.split()[:100])}..."
-    st.write(search_query)
-    print("search_query", search_query)
+    # st.write(search_query)
+    # print("search_query", search_query)
 
     # Get top 12 LeetCode results from Google
     leetcode_results = []

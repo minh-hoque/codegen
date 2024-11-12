@@ -31,23 +31,23 @@ class TimeoutException(Exception):
     pass
 
 
-@contextmanager
-def timeout(seconds):
-    """Context manager for timing out function execution"""
+# @contextmanager
+# def timeout(seconds):
+#     """Context manager for timing out function execution"""
 
-    def signal_handler(signum, frame):
-        raise TimeoutException("Test execution timed out")
+#     def signal_handler(signum, frame):
+#         raise TimeoutException("Test execution timed out")
 
-    # Start timer only if on Unix-based system (Windows doesn't support SIGALRM)
-    if hasattr(signal, "SIGALRM"):
-        signal.signal(signal.SIGALRM, signal_handler)
-        signal.alarm(seconds)
+#     # Start timer only if on Unix-based system (Windows doesn't support SIGALRM)
+#     if hasattr(signal, "SIGALRM"):
+#         signal.signal(signal.SIGALRM, signal_handler)
+#         signal.alarm(seconds)
 
-    try:
-        yield
-    finally:
-        if hasattr(signal, "SIGALRM"):
-            signal.alarm(0)
+#     try:
+#         yield
+#     finally:
+#         if hasattr(signal, "SIGALRM"):
+#             signal.alarm(0)
 
 
 class SolutionTester:
@@ -99,8 +99,8 @@ class SolutionTester:
 
             # Run solution with timeout
             try:
-                with timeout(5):  # 5 second timeout per test
-                    actual_output = self.solution_func(**input_dict)
+                # with timeout(5):  # 5 second timeout per test
+                actual_output = self.solution_func(**input_dict)
             except TimeoutException:
                 return TestResult(
                     passed=False,

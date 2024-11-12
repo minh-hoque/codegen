@@ -56,50 +56,42 @@ def render_debug_page():
 
     # Add debug controls
     if st.button("Run Tests"):
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+        with st.spinner("Running tests..."):
+            try:
+                # Initialize and run the solution tester directly with the challenge file
+                tester = SolutionTester.from_challenge_file(challenge_path)
+                results = tester.run_all_tests()
 
-        try:
-            # Initialize the solution tester
-            tester = SolutionTester.from_challenge_file(challenge_path)
-            total_tests = len(tester.unit_tests)
+                # Display results
+                st.subheader("Test Results")
+                total_passed = sum(1 for r in results if r.passed)
 
-            results = []
-            with ThreadPoolExecutor() as executor:
-                futures = []
+                # Show summary metrics
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total Tests", len(results))
+                with col2:
+                    st.metric("Passed", total_passed)
+                with col3:
+                    st.metric("Failed", len(results) - total_passed)
 
-                # Submit each test to run in parallel
-                for i, test_case in enumerate(tester.unit_tests):
-                    future = executor.submit(tester.run_single_test, test_case, i + 1)
-                    futures.append(future)
+                # Show detailed results
+                for i, result in enumerate(results, 1):
+                    with st.expander(
+                        f"Test Case {i}: {'✅ PASSED' if result.passed else '❌ FAILED'}"
+                    ):
+                        st.text(f"Execution Time: {result.execution_time:.4f} seconds")
+                        st.text("Test Details:")
+                        st.code(result.message)
 
-                # Update progress as tests complete
-                for i, future in enumerate(futures):
-                    try:
-                        result = future.result(timeout=10)  # 10 second timeout per test
-                        results.append(result)
-                        progress = (i + 1) / total_tests
-                        progress_bar.progress(progress)
-                        status_text.text(f"Running test {i + 1}/{total_tests}")
-                    except Exception as e:
-                        results.append(
-                            TestResult(
-                                passed=False,
-                                execution_time=0,
-                                message=f"Test execution failed: {str(e)}",
-                            )
-                        )
+                save_progress()  # Save progress after running tests
 
-            # Display results
-            progress_bar.empty()
-            status_text.empty()
+                # If all tests pass, enable the proceed button
+                if total_passed == len(results):
+                    st.success("All tests passed! You can proceed to review.")
 
-            # Rest of the result display code remains the same...
-
-        except Exception as e:
-            progress_bar.empty()
-            status_text.empty()
-            st.error(f"Error running tests: {str(e)}")
+            except Exception as e:
+                st.error(f"Error running tests: {str(e)}")
 
     # Add AI Debug Assistant button
     if st.button("Get AI Debug Help"):

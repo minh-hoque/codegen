@@ -9,6 +9,7 @@ from utils.prompts import (
     DEBUG_SOLUTION_PROMPT,
     REVIEW_SOLUTION_PROMPT,
     REFINE_PROMPT,
+    ANALYZE_SIMILARITY_PROMPT,
 )
 
 
@@ -184,22 +185,12 @@ def analyze_problem_similarity(
     if not _client:
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
-    similarity_prompt = f"""Your task is to analyze the similarity between the original problem statement and the found LeetCode problems.
-    Compare the following problem statement with the found LeetCode problems and assess their similarity:
-    
-    Original Problem:
-    {original_problem}
-    
-    Found LeetCode Problems:
-    {found_problems}
-    
-    Please analyze:
-    1. Is the original problem too similar to the found problems? 
-    2. Which LeetCode problems are most similar to the original problem?
-    """
+    prompt = ANALYZE_SIMILARITY_PROMPT.format(
+        original_problem=original_problem, found_problems=found_problems
+    )
 
     return query_openai(
-        _client=_client, prompt=similarity_prompt, model=model, temperature=temperature
+        _client=_client, prompt=prompt, model=model, temperature=temperature
     )
 
 

@@ -581,3 +581,17 @@ Finally, provide an overall assessment:
 
 Your validation:
 """
+
+ANALYZE_SIMILARITY_PROMPT = """Your task is to analyze the similarity between the original problem statement and the found LeetCode problems.
+Compare the following problem statement with the found LeetCode problems and assess their similarity:
+
+Original Problem:
+{original_problem}
+
+Found LeetCode Problems:
+{found_problems}
+
+Please analyze:
+1. Is the original problem too similar to the found problems? 
+2. Which LeetCode problems are most similar to the original problem?
+"""

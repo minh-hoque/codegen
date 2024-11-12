@@ -13,6 +13,9 @@ from questions_py.types import (
     Output,
     UnitTest,
 )
+import signal
+from contextlib import contextmanager
+import threading
 
 
 @dataclass
@@ -22,6 +25,29 @@ class TestResult:
     message: str
     expected_output: Any = None
     actual_output: Any = None
+
+
+class TimeoutException(Exception):
+    pass
+
+
+@contextmanager
+def timeout(seconds):
+    """Context manager for timing out function execution"""
+
+    def signal_handler(signum, frame):
+        raise TimeoutException("Test execution timed out")
+
+    # Start timer only if on Unix-based system (Windows doesn't support SIGALRM)
+    if hasattr(signal, "SIGALRM"):
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(seconds)
+
+    try:
+        yield
+    finally:
+        if hasattr(signal, "SIGALRM"):
+            signal.alarm(0)
 
 
 class SolutionTester:
@@ -71,7 +97,19 @@ class SolutionTester:
             input_dict = test_case.input
             expected_output = test_case.output
 
-            actual_output = self.solution_func(**input_dict)
+            # Run solution with timeout
+            try:
+                with timeout(5):  # 5 second timeout per test
+                    actual_output = self.solution_func(**input_dict)
+            except TimeoutException:
+                return TestResult(
+                    passed=False,
+                    execution_time=time.time() - start_time,
+                    message=f"Test case {test_number} timed out after 5 seconds",
+                    expected_output=expected_output,
+                    actual_output=None,
+                )
+
             execution_time = time.time() - start_time
 
             message = (

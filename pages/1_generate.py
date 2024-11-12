@@ -43,6 +43,10 @@ def render_generate_page():
                 initial_result = generate_question(client, category_values)
 
                 if initial_result and initial_result["status"] == "success":
+                    # Show initial result in expander
+                    with st.expander("View Initial Generated Question"):
+                        st.markdown(initial_result["generated_text"])
+
                     # Refine the generated problem
                     with st.spinner("Refining question..."):
                         refined_result = refine_problem(
@@ -50,9 +54,10 @@ def render_generate_page():
                         )
 
                         if refined_result and refined_result["status"] == "success":
-                            result = refined_result  # Use the refined version
                             set_state_value("current_question_id", str(uuid.uuid4()))
-                            set_state_value("generated_text", result["generated_text"])
+                            set_state_value(
+                                "generated_text", refined_result["generated_text"]
+                            )
                             set_state_value("selected_categories", categories)
                             save_progress()
                         else:

@@ -18,6 +18,7 @@ from utils.leetcode_utils import (
 )
 from tavily import TavilyClient
 from utils.components import card
+from dotenv import load_dotenv
 
 
 def search_leetcode_similarity(question_text, category=None):
@@ -110,65 +111,44 @@ def render_review_page():
 
     st.markdown("### Review Final Solution")
 
-    # Original question and solution display
-    with st.expander("View Original Question", expanded=True):
-        if generated_question:
-            card(generated_question, "review_question_card")
-            if selected_categories:
-                st.info(f"Category: {selected_categories}")
+    # # Original question and solution display
+    # with st.expander("View Original Question", expanded=True):
+    #     if generated_question:
+    #         card(generated_question, "review_question_card")
+    #         if selected_categories:
+    #             st.info(f"Category: {selected_categories}")
 
     with st.expander("View Final Solution", expanded=True):
         st.code(saved_solution, language="python")
 
-    # AI Review Section
-    st.markdown("### Solution Quality Review")
-    if st.button("Generate Solution Review"):
-        with st.spinner("Analyzing solution quality..."):
-            try:
-                response = review_solution(client, saved_solution)
-                review_result = (
-                    response["generated_text"]
-                    if response["status"] == "success"
-                    else None
-                )
-                if review_result:
-                    card(review_result, "review_result_card")
-                    set_state_value(
-                        "review_completed", True
-                    )  # Mark review step as completed
-                    save_progress()
-            except Exception as e:
-                st.error(f"Error getting solution review: {str(e)}")
+    # Create two columns for reviews and similarity searches
+    col1, col2 = st.columns(2)
 
-    # Similarity Check Section
-    st.markdown("### Similarity Check")
-    if st.button("Check for Similar Problems"):
-        with st.spinner("Searching for similar problems..."):
-            category = selected_categories[0] if selected_categories else None
-            similar_problems = search_leetcode_similarity(generated_question, category)
+    # Left Column - Quality Reviews
+    with col1:
+        st.markdown("### Solution Quality Review")
+        if st.button("Generate Solution Review"):
+            with st.spinner("Analyzing solution quality..."):
+                try:
+                    response = review_solution(client, saved_solution)
+                    review_result = (
+                        response["generated_text"]
+                        if response["status"] == "success"
+                        else None
+                    )
+                    if review_result:
+                        card(review_result, "review_result_card")
+                        set_state_value("review_completed", True)
+                        save_progress()
+                except Exception as e:
+                    st.error(f"Error getting solution review: {str(e)}")
 
-            if similar_problems:
-                st.markdown(
-                    f"#### Potentially Similar LeetCode {category if category else ''} Problems:"
-                )
-                for title, link in similar_problems:
-                    st.markdown(f"- [{title}]({link})")
-            else:
-                st.info(
-                    f"No similar {''+category if category else ''} problems found on LeetCode."
-                )
+    # Right Column - Similarity Searches
+    with col2:
+        st.markdown("### Similar Problems")
 
-    # Add Tavily Search Section
-    st.markdown("### Search Similar Problems Online")
-    if st.button("Search Similar Problems Online"):
-        try:
-            tavily_api_key = os.getenv("TAVILY_API_KEY")
-            if not tavily_api_key:
-                st.error("Please set your TAVILY_API_KEY in the environment variables")
-                return
-
-            tavily_client = TavilyClient(api_key=tavily_api_key)
-
+        # Online Search Button
+        if st.button("Search Similar Problems Online"):
             with st.spinner(
                 "Searching for similar problems across coding platforms..."
             ):
@@ -190,7 +170,14 @@ def render_review_page():
                                 "Could not find problem statement in challenge file"
                             )
                             return
+                        problem_statement = """"Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
 
+                        You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+                        You can return the answer in any order.
+                        """
+
+                        tavily_client = TavilyClient(os.getenv("TAVILY_API_KEY"))
                         search_results = get_similar_problems_context(
                             problem_statement, tavily_client
                         )
@@ -216,95 +203,84 @@ def render_review_page():
                 except Exception as e:
                     st.error(f"Error reading challenge file: {str(e)}")
 
-        except Exception as e:
-            st.error(f"Error during search: {str(e)}")
+        # LeetCode Search Button
+        if st.button("Find Similar LeetCode Problems"):
+            with st.spinner("Searching for similar problems..."):
+                # Read problem statement from challenge file
+                try:
+                    with open(challenge_file, "r") as f:
+                        file_contents = f.read()
+                        # Extract problem statement from the challenge file
+                        # Assuming the problem statement is stored in a variable named problem_statement
+                        problem_statement = None
+                        exec_globals = {}
+                        exec(file_contents, exec_globals)
+                        problem_statement = exec_globals.get("problem_statement")
 
-    # Export functionality
-    st.markdown("### Export Solution")
-    if st.download_button(
-        label="Export Complete Package",
-        data=f"""# Question
-{generated_question or ''}
+                        if problem_statement:
+                            results = find_similar_leetcode_problems(problem_statement)
+                            st.write(results)
+                            st.session_state.similar_problems = results[
+                                "similar_problems"
+                            ]
+                            st.session_state.similarity_analysis = results[
+                                "similarity_analysis"
+                            ]
+                        else:
+                            st.error(
+                                "Could not find problem statement in challenge file"
+                            )
+                except Exception as e:
+                    st.error(f"Error reading challenge file: {str(e)}")
 
-# Category
-{selected_categories or 'Not specified'}
+        # Display LeetCode results if they exist
+        if st.session_state.get("similar_problems"):
+            st.subheader("Similar LeetCode Problems")
+            for problem in st.session_state.similar_problems:
+                st.markdown(f"- [{problem['title']}]({problem['url']})")
 
-# Solution
-{saved_solution or ''}
+            st.subheader("Similarity Analysis")
+            st.write(st.session_state.similarity_analysis)
 
-# Review Notes
-This problem was generated and reviewed using an AI-assisted process.
-""",
-        file_name="coding_challenge.txt",
-        mime="text/plain",
-    ):
-        st.success("Package exported successfully!")
-        set_state_value(
-            "review_completed", True
-        )  # Mark review step as completed when exporting
-        save_progress()
+    # Combined download and complete section at the bottom
+    st.markdown("---")
+    st.markdown("### Complete and Download Challenge")
 
-    # Add completion button
-    st.markdown("### Complete Challenge")
-    if st.button("Mark as Complete"):
-        if not challenge_file:
-            st.error("No challenge file found. Please complete previous steps first.")
-            return
+    col1, col2 = st.columns(2)
+    with col1:
+        if challenge_file and os.path.exists(challenge_file):
+            with open(challenge_file, "r") as f:
+                challenge_content = f.read()
 
-        try:
-            # Save the final challenge
-            final_path = save_final_challenge(
-                challenge_file, st.session_state.current_question_id
+            if st.download_button(
+                label="Download and Complete Challenge",
+                data=challenge_content,
+                file_name=os.path.basename(challenge_file),
+                mime="text/x-python",
+            ):
+                try:
+                    # Save the final challenge
+                    final_path = save_final_challenge(
+                        challenge_file, st.session_state.current_question_id
+                    )
+
+                    # Update state
+                    set_state_value("status", "completed")
+                    set_state_value("review_completed", True)
+                    save_progress()
+
+                    st.success(
+                        f"Challenge completed! Final version saved to: {final_path}"
+                    )
+                    st.info(
+                        "You can find your completed challenge in the 'final_challenges' folder."
+                    )
+                except Exception as e:
+                    st.error(f"Error completing challenge: {str(e)}")
+        else:
+            st.warning(
+                "Challenge file not found. Please complete previous steps first."
             )
-
-            # Update state
-            set_state_value("status", "completed")
-            set_state_value("review_completed", True)
-            save_progress()
-
-            st.success(f"Challenge completed! Final version saved to: {final_path}")
-
-            # Show a message about where to find the file
-            st.info(
-                "You can find your completed challenge in the 'final_challenges' folder."
-            )
-
-        except Exception as e:
-            st.error(f"Error completing challenge: {str(e)}")
-
-    if st.button("Find Similar LeetCode Problems"):
-        with st.spinner("Searching for similar problems..."):
-            # Read problem statement from challenge file
-            try:
-                with open(challenge_file, "r") as f:
-                    file_contents = f.read()
-                    # Extract problem statement from the challenge file
-                    # Assuming the problem statement is stored in a variable named problem_statement
-                    problem_statement = None
-                    exec_globals = {}
-                    exec(file_contents, exec_globals)
-                    problem_statement = exec_globals.get("problem_statement")
-
-                    st.write(problem_statement)
-                    if problem_statement:
-                        results = find_similar_leetcode_problems(problem_statement)
-                        st.write(results)
-                        st.session_state.similar_problems = results["similar_problems"]
-                        st.session_state.similarity_analysis = results[
-                            "similarity_analysis"
-                        ]
-                    else:
-                        st.error("Could not find problem statement in challenge file")
-            except Exception as e:
-                st.error(f"Error reading challenge file: {str(e)}")
-
-    if st.session_state.similar_problems:
-        st.subheader("Similar LeetCode Problems")
-        for problem in st.session_state.similar_problems:
-            st.markdown(f"- [{problem['title']}]({problem['url']})")
-
-        st.subheader("Similarity Analysis")
-        st.write(st.session_state.similarity_analysis)
 
 
 if __name__ == "__main__":

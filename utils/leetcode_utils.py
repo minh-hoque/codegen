@@ -7,6 +7,7 @@ from tavily import TavilyClient
 import json
 import streamlit as st
 from typing import Dict, List, Any
+import time
 
 CODING_PLATFORMS = [
     "https://leetcode.com",
@@ -49,27 +50,47 @@ def find_similar_leetcode_problems(problem_statement: str) -> Dict:
 
     # Search query formation
     search_query = f"leetcode {' '.join(problem_statement.split()[:100])}..."
+    st.write(search_query)
     print("search_query", search_query)
 
-    # Get top 5 LeetCode results from Google
+    # Get top 12 LeetCode results from Google
     leetcode_results = []
     try:
-        search_results = search(search_query, num_results=8, lang="en")
+        search_results = search(search_query, num_results=12, lang="en")
         print("search_results", search_results)
         for result in search_results:
-            # print("result", result)
+            print("result", result)
             if isinstance(result, str):
                 leetcode_results.append(result)
-                print("leetcode_results", leetcode_results)
+                # print("leetcode_results", leetcode_results)
     except Exception as e:
         print(f"Error during Google search: {e}")
         return {"error": str(e)}
 
+    print("leetcode_results", leetcode_results)
     # Extract problem details from LeetCode URLs
     problems_info = []
     for url in leetcode_results:
         try:
-            response = requests.get(url)
+            # Update the headers with more realistic browser information
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1",
+                "Cache-Control": "max-age=0",
+            }
+
+            # Add delay between requests to avoid rate limiting
+            # time.sleep(2)  # Add a 2-second delay between requests
+            response = requests.get(url, headers=headers, timeout=10)
+            print("response", response)
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
                 title_element = soup.find("title")
@@ -78,6 +99,8 @@ def find_similar_leetcode_problems(problem_statement: str) -> Dict:
                 problems_info.append(
                     {"title": title.replace(" - LeetCode", ""), "url": url}
                 )
+            else:
+                print(f"Error fetching problem details: {response.status_code}")
         except Exception as e:
             print(f"Error fetching problem details: {e}")
             continue
@@ -117,10 +140,12 @@ def get_similar_problems_context(
     """
     # Truncate problem statement to avoid query length issues (400 token max)
     truncated_query = (
-        problem_statement[:400] + "..."
+        problem_statement[:397] + "..."
         if len(problem_statement) > 400
         else problem_statement
     )
+    print("truncated_query", truncated_query)
+    print("len(truncated_query)", len(truncated_query))
 
     try:
         # Get search context from Tavily

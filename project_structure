@@ -1,24 +1,34 @@
 .
 ├── CodeGen.py                      # Main application entry point
-├── challenges/                     # Directory containing coding challenge implementations
-│   └── coding_challenge_01.py      # First coding challenge implementation
-├── data/                          # Directory for storing application data
-│   └── questions.json             # JSON file containing coding questions and metadata
-├── pages/                         # Streamlit pages for different sections of the app
-│   ├── 1_generate.py             # Page for generating new coding questions
-│   ├── 2_solve.py                # Page for solving coding questions
-│   ├── 3_debug.py                # Page for debugging solutions
-│   ├── 4_format.py               # Page for formatting solutions
-│   └── 5_review.py               # Page for reviewing and validating solutions
-├── questions_py/                  # Package for question-related type definitions
-│   └── types.py                  # Type definitions for questions, metadata, and tests
-└── utils/                        # Utility modules for various functionalities
-    ├── components.py             # Reusable UI components for Streamlit
-    ├── constants.py              # Application-wide constants and configurations
-    ├── db_utils.py              # Database interaction utilities
-    ├── file_utils.py            # File handling utilities
-    ├── openai_utils.py          # OpenAI API interaction utilities
-    ├── progress_utils.py        # Progress tracking and management utilities
-    ├── prompts.py              # Templates for OpenAI API prompts
-    ├── solution_tester.py       # Utilities for testing coding solutions
-    └── state_utils.py          # State management utilities for Streamlit 
+├── Dockerfile                      # Container configuration for deployment
+├── docker-compose.yml             # Docker compose configuration for services
+├── scripts/                       # Deployment and utility scripts
+│   ├── setup_ec2.sh              # EC2 instance setup script
+│   ├── monitor.py                # System resource monitoring script
+│   └── migrate_to_mongodb.py     # MongoDB migration utility
+├── challenges/                    # Directory containing coding challenge implementations
+│   └── coding_challenge_01.py    # First coding challenge implementation
+├── data/                         # Directory for storing application data
+│   └── questions.json            # JSON file containing coding questions and metadata
+├── pages/                        # Streamlit pages for different sections of the app
+│   ├── 1_generate.py            # Page for generating new coding questions
+│   ├── 2_solve.py              # Page for solving coding questions
+│   ├── 3_debug.py              # Page for debugging solutions
+│   ├── 4_format.py             # Page for formatting solutions
+│   └── 5_review.py             # Page for reviewing and validating solutions
+├── questions_py/                 # Package for question-related type definitions
+│   └── types.py                 # Type definitions for questions, metadata, and tests
+├── utils/                       # Utility modules for various functionalities
+│   ├── components.py            # Reusable UI components for Streamlit
+│   ├── constants.py             # Application-wide constants and configurations
+│   ├── db_utils.py             # Database interaction utilities
+│   ├── file_utils.py           # File handling utilities
+│   ├── mongo_utils.py          # MongoDB specific utilities and connection handling
+│   ├── openai_utils.py         # OpenAI API interaction utilities
+│   ├── progress_utils.py       # Progress tracking and management utilities
+│   ├── prompts.py             # Templates for OpenAI API prompts
+│   ├── solution_tester.py      # Utilities for testing coding solutions
+│   └── state_utils.py         # State management utilities for Streamlit
+├── .streamlit/                  # Streamlit configuration directory
+│   └── config.toml             # Streamlit configuration file
+└── requirements.txt            # Python package dependencies

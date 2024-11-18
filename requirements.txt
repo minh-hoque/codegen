@@ -1,91 +1,96 @@
-altair==5.4.1
-annotated-types==0.7.0
-anyio==4.6.2.post1
-appnope @ file:///home/conda/feedstock_root/build_artifacts/appnope_1707233003401/work
-asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1698341106958/work
-attrs==24.2.0
-beautifulsoup4==4.12.3
-blinker==1.8.2
-bs4==0.0.2
-cachetools==5.5.0
-certifi==2024.8.30
-charset-normalizer==3.4.0
-click==8.1.7
-comm @ file:///home/conda/feedstock_root/build_artifacts/comm_1710320294760/work
-debugpy @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/debugpy_1728587661893/work
-decorator @ file:///home/conda/feedstock_root/build_artifacts/decorator_1641555617451/work
-distro==1.9.0
-exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1720869315914/work
-executing @ file:///home/conda/feedstock_root/build_artifacts/executing_1725214404607/work
-gitdb==4.0.11
-GitPython==3.1.43
-googlesearch-python==1.2.5
-h11==0.14.0
-httpcore==1.0.6
-httpx==0.27.2
-idna==3.10
-importlib_metadata @ file:///home/conda/feedstock_root/build_artifacts/importlib-metadata_1726082825846/work
-ipykernel @ file:///Users/runner/miniforge3/conda-bld/ipykernel_1719845458456/work
-ipython @ file:///home/conda/feedstock_root/build_artifacts/ipython_1727944696411/work
-jedi @ file:///home/conda/feedstock_root/build_artifacts/jedi_1696326070614/work
-Jinja2==3.1.4
-jiter==0.6.1
-jsonschema==4.23.0
-jsonschema-specifications==2024.10.1
-jupyter_client @ file:///home/conda/feedstock_root/build_artifacts/jupyter_client_1726610684920/work
-jupyter_core @ file:///home/conda/feedstock_root/build_artifacts/jupyter_core_1727163409502/work
-markdown-it-py==3.0.0
-MarkupSafe==3.0.2
-matplotlib-inline @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-inline_1713250518406/work
-mdurl==0.1.2
-narwhals==1.12.1
-nest_asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1705850609492/work
-numpy==2.1.2
-openai==1.52.0
-packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1718189413536/work
-pandas==2.2.3
-parso @ file:///home/conda/feedstock_root/build_artifacts/parso_1712320355065/work
-pexpect @ file:///home/conda/feedstock_root/build_artifacts/pexpect_1706113125309/work
-pickleshare @ file:///home/conda/feedstock_root/build_artifacts/pickleshare_1602536217715/work
-pillow==10.4.0
-platformdirs @ file:///home/conda/feedstock_root/build_artifacts/platformdirs_1726613481435/work
-prompt_toolkit @ file:///home/conda/feedstock_root/build_artifacts/prompt-toolkit_1727341649933/work
-protobuf==5.28.3
-psutil @ file:///Users/runner/miniforge3/conda-bld/psutil_1728965172266/work
-ptyprocess @ file:///home/conda/feedstock_root/build_artifacts/ptyprocess_1609419310487/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
-pure_eval @ file:///home/conda/feedstock_root/build_artifacts/pure_eval_1721585709575/work
-pyarrow==18.0.0
-pydantic==2.9.2
-pydantic_core==2.23.4
-pydeck==0.9.1
-Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1714846767233/work
-python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1709299778482/work
-python-dotenv==1.0.1
-pytz==2024.2
-pyzmq @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pyzmq_1728585614755/work
-referencing==0.35.1
-regex==2024.11.6
-requests==2.32.3
-rich==13.9.3
-rpds-py==0.20.1
-setuptools==75.1.0
-six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
-smmap==5.0.1
-sniffio==1.3.1
-soupsieve==2.6
-stack-data @ file:///home/conda/feedstock_root/build_artifacts/stack_data_1669632077133/work
-streamlit==1.39.0
-tavily-python==0.5.0
-tenacity==9.0.0
-tiktoken==0.8.0
-toml==0.10.2
-tornado @ file:///Users/runner/miniforge3/conda-bld/tornado_1724960696129/work
-tqdm==4.66.5
-traitlets @ file:///home/conda/feedstock_root/build_artifacts/traitlets_1713535121073/work
-typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1717802530399/work
-tzdata==2024.2
-urllib3==2.2.3
-uv==0.4.25
-wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1704731205417/work
-wheel==0.44.0
-zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1726248574750/work
+Package                   Version
+------------------------- -----------
+altair                    5.4.1
+annotated-types           0.7.0
+anyio                     4.6.2.post1
+appnope                   0.1.4
+asttokens                 2.4.1
+attrs                     24.2.0
+beautifulsoup4            4.12.3
+blinker                   1.8.2
+bs4                       0.0.2
+cachetools                5.5.0
+certifi                   2024.8.30
+charset-normalizer        3.4.0
+click                     8.1.7
+comm                      0.2.2
+debugpy                   1.6.7
+decorator                 5.1.1
+distro                    1.9.0
+dnspython                 2.7.0
+exceptiongroup            1.2.2
+executing                 2.1.0
+gitdb                     4.0.11
+GitPython                 3.1.43
+googlesearch-python       1.2.5
+h11                       0.14.0
+httpcore                  1.0.6
+httpx                     0.27.2
+idna                      3.10
+importlib_metadata        8.5.0
+ipykernel                 6.29.5
+ipython                   8.28.0
+jedi                      0.19.1
+Jinja2                    3.1.4
+jiter                     0.6.1
+jsonschema                4.23.0
+jsonschema-specifications 2024.10.1
+jupyter_client            8.6.3
+jupyter_core              5.7.2
+markdown-it-py            3.0.0
+MarkupSafe                3.0.2
+matplotlib-inline         0.1.7
+mdurl                     0.1.2
+narwhals                  1.12.1
+nest_asyncio              1.6.0
+numpy                     2.1.2
+openai                    1.52.0
+packaging                 24.1
+pandas                    2.2.3
+parso                     0.8.4
+pexpect                   4.9.0
+pickleshare               0.7.5
+pillow                    10.4.0
+pip                       24.2
+platformdirs              4.3.6
+prompt_toolkit            3.0.48
+protobuf                  5.28.3
+psutil                    6.0.0
+ptyprocess                0.7.0
+pure_eval                 0.2.3
+pyarrow                   18.0.0
+pydantic                  2.9.2
+pydantic_core             2.23.4
+pydeck                    0.9.1
+Pygments                  2.18.0
+pymongo                   4.10.1
+python-dateutil           2.9.0
+python-dotenv             1.0.1
+pytz                      2024.2
+pyzmq                     25.1.2
+referencing               0.35.1
+regex                     2024.11.6
+requests                  2.32.3
+rich                      13.9.3
+rpds-py                   0.20.1
+setuptools                75.1.0
+six                       1.16.0
+smmap                     5.0.1
+sniffio                   1.3.1
+soupsieve                 2.6
+stack-data                0.6.2
+streamlit                 1.39.0
+tavily-python             0.5.0
+tenacity                  9.0.0
+tiktoken                  0.8.0
+toml                      0.10.2
+tornado                   6.4.1
+tqdm                      4.66.5
+traitlets                 5.14.3
+typing_extensions         4.12.2
+tzdata                    2024.2
+urllib3                   2.2.3
+uv                        0.4.25
+wcwidth                   0.2.13
+wheel                     0.44.0
+zipp                      3.20.2

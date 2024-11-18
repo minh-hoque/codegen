@@ -105,9 +105,8 @@ REFINE_PROMPT = """Your task is to refine and improve a coding problem to make i
 2. Improve the clarity and quality by:
    - Making the problem statement more precise and clear.
    - Making the problem statement require high-level reading comprehension and critical thinking.
-   - Ensuring all edge cases are clearly specified.
    - Adding helpful examples where needed.
-   - Making constraints explicit and well-justified.
+   - Making constraints explicit and well-justified under the metadata section.
    - Ensuring unit tests cover all important cases.
 3. Maintain the same core problem and difficulty level
 4. Keep the format consistent with the original input problem

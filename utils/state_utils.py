@@ -3,6 +3,7 @@ import streamlit as st
 from utils.db_utils import JsonDB
 import uuid
 from utils.leetcode_utils import find_similar_leetcode_problems
+import os
 
 
 def initialize_session_state():
@@ -28,7 +29,14 @@ def initialize_session_state():
     if "current_question_id" not in st.session_state:
         st.session_state.current_question_id = None
     if "db" not in st.session_state:
-        st.session_state.db = JsonDB()
+        use_mongo = os.getenv("USE_MONGODB", "false").lower() == "true"
+        if use_mongo:
+            from utils.mongo_utils import MongoDB
+
+            mongo_uri = os.getenv("MONGODB_URI")
+            st.session_state.db = MongoDB(mongo_uri)
+        else:
+            st.session_state.db = JsonDB()
     if "debug_response" not in st.session_state:
         st.session_state.debug_response = None
     if "generate_completed" not in st.session_state:

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Update system packages
-sudo apt-get update
-sudo apt-get upgrade -y
+sudo yum update -y
 
 # Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
 
 # Install Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -37,11 +37,11 @@ sudo chmod 600 ~/codegen/secrets/.env
 # Add current user to docker group
 sudo usermod -aG docker $USER
 
-# Install monitoring tools
-sudo apt-get install -y htop nginx
+# Install monitoring tools (Amazon Linux alternatives)
+sudo yum install -y htop nginx
 
 # Configure Nginx as reverse proxy
-sudo tee /etc/nginx/sites-available/streamlit <<EOF
+sudo tee /etc/nginx/conf.d/streamlit.conf <<EOF
 server {
     listen 80;
     server_name YOUR_DOMAIN_OR_IP;
@@ -57,7 +57,19 @@ server {
 }
 EOF
 
-# Enable the Nginx site
-sudo ln -s /etc/nginx/sites-available/streamlit /etc/nginx/sites-enabled
-sudo rm /etc/nginx/sites-enabled/default
-sudo systemctl restart nginx 
+# Start and enable Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# Configure firewall (using AWS security groups is recommended instead)
+sudo yum install -y firewalld
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+
+echo "Setup complete! Please:"
+echo "1. Update the .env file with your actual credentials"
+echo "2. Update the Nginx configuration with your actual domain/IP"
+echo "3. Log out and log back in for docker group membership to take effect" 

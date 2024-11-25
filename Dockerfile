@@ -11,6 +11,7 @@ COPY requirements.txt .
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
+    nginx \
     && pip install --no-cache-dir -r requirements.txt \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -21,8 +22,8 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p challenges data final_challenges
 
-# Expose port 8501 (Streamlit's default port)
-EXPOSE 8501
+# Expose ports for both Nginx and Streamlit
+EXPOSE 80 8501
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1

@@ -100,6 +100,7 @@ def main():
     initialize_session_state()
 
     st.title("Coding Question Generator")
+    st.image("images/logo.png")
 
     # Add tabs for new question and history
     tab1, tab2 = st.tabs(["New Question", "History"])

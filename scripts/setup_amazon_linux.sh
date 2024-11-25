@@ -59,9 +59,19 @@ echo "Environment file created and secured"
 echo "Adding current user to docker group..."
 sudo usermod -aG docker $USER
 
-# Install monitoring tools
-echo "Installing monitoring tools..."
-sudo yum install -y htop nginx
+# Install monitoring tools and nginx
+echo "Installing monitoring tools and nginx..."
+sudo yum install -y htop
+sudo yum update -y
+sudo amazon-linux-extras enable nginx1
+sudo yum install nginx -y
+sudo systemctl start nginx
+if ! sudo systemctl is-active --quiet nginx; then
+    echo "Error: Nginx failed to start"
+    exit 1
+fi
+sudo systemctl enable nginx
+echo "Nginx installed and running successfully"
 
 # Configure Nginx as reverse proxy
 echo "Configuring Nginx as reverse proxy..."
@@ -80,16 +90,6 @@ server {
     }
 }
 EOF
-
-# Start and enable Nginx
-echo "Starting Nginx service..."
-sudo systemctl start nginx
-if ! sudo systemctl is-active --quiet nginx; then
-    echo "Error: Nginx failed to start"
-    exit 1
-fi
-sudo systemctl enable nginx
-echo "Nginx configured and running successfully"
 
 # Verify installations
 echo -e "\nVerifying installations:"

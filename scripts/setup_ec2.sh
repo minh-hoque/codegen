@@ -46,9 +46,16 @@ sudo chmod 600 ~/codegen/secrets/.env
 echo "Adding current user to docker group..."
 sudo usermod -aG docker $USER
 
-# Install monitoring tools
-echo "Installing monitoring tools..."
+# Install monitoring tools and nginx
+echo "Installing monitoring tools and nginx..."
+sudo apt-get update
 sudo apt-get install -y htop nginx
+if ! sudo systemctl is-active --quiet nginx; then
+    echo "Error: Nginx failed to start"
+    exit 1
+fi
+sudo systemctl enable nginx
+echo "Nginx installed and running successfully"
 
 # Configure Nginx as reverse proxy
 echo "Configuring Nginx as reverse proxy..."

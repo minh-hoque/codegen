@@ -99,8 +99,8 @@ def main():
     setup_streamlit()
     initialize_session_state()
 
-    st.title("Coding Question Generator")
-    st.image("images/logo.png")
+    st.title("CodeGen")
+    st.image("images/logo.png", width=500)
 
     # Add tabs for new question and history
     tab1, tab2 = st.tabs(["New Question", "History"])
@@ -108,7 +108,7 @@ def main():
     with tab1:
         st.markdown(
             """
-        ## Welcome to the Coding Question Generator
+        ## Welcome to CodeGen.
         
         This tool helps you generate high-quality coding questions using AI.
         

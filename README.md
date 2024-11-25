@@ -1,5 +1,6 @@
 # AI Code Challenge Generator
 
+![Logo](images/logo.png)
 A Streamlit-based web application that generates, validates, and helps solve coding challenges using AI. The application supports multiple users and integrates with OpenAI's GPT models for intelligent question generation and solution validation.
 
 ## 🌟 Features

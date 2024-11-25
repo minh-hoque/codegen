@@ -107,7 +107,7 @@ To generate a high-quality coding problem, follow these steps:
 1. **Create a Problem Statement**:
    - Write a clear, challenging, natural-language description of a coding problem that needs to be of the category {selected_category}.
    - Ensure the problem is **fully executable**, **testable** with unit tests.
-   - Make the problem language-agnostic—it should be solvable in any programming language.
+   - Make the problem language-agnostic. It should be solvable in any programming language.
    - Use creative or real-world scenarios requiring interpretation and mapping to a coding solution.
    - Ensure the problem corresponds to a **Medium** or **Hard** difficulty level (comparable to Leetcode) and requires algorithmic thinking or data structure usage.
    - Include all necessary information to enable the user to solve the problem without assumptions.

@@ -181,6 +181,29 @@
       "status": "started",
       "last_updated": "2024-11-24T23:57:23.971094",
       "created_at": "2024-11-24T23:57:23.971139"
+    },
+    {
+      "id": "979c5a78-388b-4d58-8a46-2ee07075fbe9",
+      "selected_category": null,
+      "generated_text": "**Problem Statement**:\nThe Interplanetary Postal Service (IPS) on Mars is facing challenges with delayed mail deliveries due to inefficient routing between cities. Mars is divided into `n` cities, numbered from `1` to `n`. Mail is transported between these cities using `m` bidirectional teleporters. Each teleporter connects two cities, `a_i` and `b_i`, and costs `t_i` Martian coins to use.\n\nAs a consultant, your task is to optimize the mail delivery system. You are provided with a list of mail deliveries, each represented as a pair of cities: the origin and the destination. Your goal is to determine the minimum number of Martian coins required to complete all mail deliveries. If any delivery is impossible, return `-1`.\n\n**Function Signature**:\n```python\ndef min_coins_to_deliver_mail(n: int, m: int, trips_costs: List[Tuple[int, int, int]], deliveries: List[Tuple[int, int]]) -> int:\n```\n\n**Parameters**:\n- `n` (int): The number of cities. Constraints: `1 <= n <= 200,000`.\n- `m` (int): The number of teleporters. Constraints: `1 <= m <= 200,000`.\n- `trips_costs` (List[Tuple[int, int, int]]): A list of `m` tuples, each containing three integers `a_i`, `b_i`, and `t_i`, representing a teleporter between cities `a_i` and `b_i` with a cost of `t_i` Martian coins. Constraints: `1 <= a_i, b_i <= n`, `0 <= t_i <= 10,000`.\n- `deliveries` (List[Tuple[int, int]]): A list of pairs of cities, where each pair represents a mail delivery from the first city to the second.\n\n**Returns**:\n- An integer representing the minimum number of Martian coins needed to perform all mail deliveries. Return `-1` if any delivery is impossible.\n\n**Examples**:\n1. `min_coins_to_deliver_mail(10, 9, [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)], [(1, 7)])` returns `6`.\n   - Explanation: The mail can be delivered from city 1 to city 7 via cities 2, 3, 4, 5, and 6, costing 1 coin per teleport.\n\n2. `min_coins_to_deliver_mail(5, 5, [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)], [(1, 2), (2, 1)])` returns `0`.\n   - Explanation: The teleporters between cities 1 and 2, and 1 and 3 cost 0 coins, allowing free delivery.\n\n3. `min_coins_to_deliver_mail(6, 7, [(1, 2, 1), (2, 3, 2), (3, 4, 3), (4, 5, 4), (5, 6, 5), (6, 1, 6), (1, 3, 7)], [(1, 6), (6, 1)])` returns `7`.\n   - Explanation: The optimal path from city 1 to city 6 is via city 3, costing 7 coins.\n\n4. `min_coins_to_deliver_mail(3, 3, [(1, 2, 10000), (2, 3, 10000), (3, 1, 10000)], [(1, 3), (3, 1)])` returns `20000`.\n   - Explanation: The delivery from city 1 to city 3 and back costs 20000 coins in total.\n\n5. `min_coins_to_deliver_mail(2, 1, [(1, 2, 1)], [(2, 1)])` returns `-1`.\n   - Explanation: There is no teleporter from city 2 to city 1, making the delivery impossible.\n\n**Metadata**:\n- Difficulty: Hard\n- Time Required: 90 minutes\n- Categories: Graph Theory, Shortest Path\n\n**Golden Unit Tests**:\n```python\nassert min_coins_to_deliver_mail(10, 9, [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)], [(1, 7)]) == 6\nassert min_coins_to_deliver_mail(5, 5, [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)], [(1, 2), (2, 1)]) == 0\nassert min_coins_to_deliver_mail(6, 7, [(1, 2, 1), (2, 3, 2), (3, 4, 3), (4, 5, 4), (5, 6, 5), (6, 1, 6), (1, 3, 7)], [(1, 6), (6, 1)]) == 7\nassert min_coins_to_deliver_mail(3, 3, [(1, 2, 10000), (2, 3, 10000), (3, 1, 10000)], [(1, 3), (3, 1)]) == 20000\nassert min_coins_to_deliver_mail(2, 1, [(1, 2, 1)], [(2, 1)]) == -1\n```",
+      "generated_question": null,
+      "test_validation": null,
+      "solution_text": null,
+      "solution": null,
+      "formatted_text": null,
+      "saved_solution": null,
+      "challenge_file": null,
+      "debug_response": null,
+      "generate_completed": false,
+      "solve_completed": false,
+      "format_completed": false,
+      "debug_completed": false,
+      "review_completed": false,
+      "similar_problems": null,
+      "similarity_analysis": null,
+      "status": "started",
+      "last_updated": "2024-11-25T00:02:25.156528",
+      "created_at": "2024-11-25T00:02:25.156556"
     }
   ]
 }

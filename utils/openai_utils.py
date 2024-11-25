@@ -62,7 +62,7 @@ def generate_question(
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
     categories_str = ", ".join(categories)
-    prompt = GENERATE_V2_PROMPT.format(selected_category=categories_str)
+    prompt = GENERATE_PROMPT.format(selected_category=categories_str)
     return query_openai(_client, prompt, temperature=0.8)
 
 

@@ -3,6 +3,7 @@ from openai import OpenAI
 import streamlit as st
 from utils.prompts import (
     GENERATE_PROMPT,
+    GENERATE_V2_PROMPT,
     VALIDATE_TESTS_PROMPT,
     SOLVE_SOLUTION_PROMPT,
     FORMAT_PROMPT,
@@ -61,7 +62,7 @@ def generate_question(
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
     categories_str = ", ".join(categories)
-    prompt = GENERATE_PROMPT.format(selected_category=categories_str)
+    prompt = GENERATE_V2_PROMPT.format(selected_category=categories_str)
     return query_openai(_client, prompt, temperature=0.8)
 
 

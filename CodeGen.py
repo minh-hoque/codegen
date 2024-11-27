@@ -50,7 +50,7 @@ def show_history():
             col1, col2 = st.columns([3, 1])
             with col1:
                 st.markdown(
-                    f"**Last Updated:** {q.get('last_updated', '')[:19].replace('T', ' ')}"
+                    f"**Last Updated:** {str(q.get('last_updated', ''))[:19].replace('T', ' ')}"
                 )
 
             with col2:

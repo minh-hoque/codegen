@@ -3,6 +3,7 @@ from openai import OpenAI
 import streamlit as st
 from utils.prompts import (
     GENERATE_PROMPT,
+    GENERATE_V2_PROMPT,
     VALIDATE_TESTS_PROMPT,
     SOLVE_SOLUTION_PROMPT,
     FORMAT_PROMPT,

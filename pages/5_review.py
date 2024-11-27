@@ -138,7 +138,6 @@ def render_review_page():
                     )
                     if review_result:
                         card(review_result, "review_result_card")
-                        set_state_value("review_completed", True)
                         save_progress()
                 except Exception as e:
                     st.error(f"Error getting solution review: {str(e)}")

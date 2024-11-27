@@ -98,6 +98,107 @@ The Output format should follow:
 **Golden unit tests**:
 """
 
+GENERATE_V2_PROMPT = """### Task
+Your task is to help create a Python coding problem to improve LLM performance in solving practical programming tasks. You need to generate high-quality coding problems adhering to the specifications below.
+
+### Instructions
+To generate a high-quality coding problem, follow these steps:
+
+1. **Create a Problem Statement**:
+   - Write a clear, challenging, natural-language description of a coding problem that needs to be of the category {selected_category}.
+   - Ensure the problem is **fully executable**, **testable** with unit tests.
+   - Make the problem language-agnostic. It should be solvable in any programming language.
+   - Use creative or real-world scenarios requiring interpretation and mapping to a coding solution.
+   - Ensure the problem corresponds to a **Medium** or **Hard** difficulty level (comparable to Leetcode) and requires algorithmic thinking or data structure usage.
+   - Include all necessary information to enable the user to solve the problem without assumptions.
+   - Make sure the problem statement is not a copy of the examples or of an existing Leetcode coding problem.
+   
+
+2. **Provide Metadata**:
+   - Specify input/output types and constraints.
+   - Clearly define constraints on variables (e.g., valid ranges, lengths, or types).
+   - Indicate the approximate difficulty level: “Medium” or “Hard.”
+   - Estimate the time required for solving the problem, including coding and testing.
+
+3. **Write Golden Unit Tests**:
+   - Create unit tests covering edge cases such as:
+     - Minimum and maximum inputs
+     - Special cases (e.g., null/zero scenarios, invalid input handling)
+     - Time complexity boundary scenarios
+   - Include explanations for how each test validates the correctness of the solution.
+   - Ensure unit tests are efficient and provide comprehensive coverage.
+
+4. **Output Format**:
+   - **Problem Statement**: Include a well-written description of the coding problem.
+   - **Metadata**: List inputs, outputs, constraints, difficulty, and category.
+   - **Golden Unit Tests**: Provide sample inputs, expected outputs, and edge-case coverage.
+
+### Requirements
+#### Problem Statement
+- Must describe a fully executable, and testable coding problem.
+- Should not rely on external libraries (use only Python’s standard library).
+- DO NOT plagiarize existing Leetcode coding problems.
+- Do not copy the provided examples.
+- Should include scenarios requiring logical reasoning and algorithmic problem-solving.
+- Clearly formatted, grammatically correct, and free of errors.
+
+#### Metadata
+- Input/output variable names must be concise and generic (e.g., `n`, `m`).
+- Constraints must use clear mathematical notation (e.g., `1 <= n <= 200000`).
+- Output descriptions should address edge cases (e.g., when valid outputs do not exist).
+- The problem category needs to be {selected_category}.
+
+#### Golden Unit Tests
+- The set of unit tests provides good coverage of all edge cases, guaranteeing that the provided solution is correct.
+- Generate as many unit tests as needed to cover all edge cases.
+- The unit tests include tests such as “minimum input,” “maximum input,” “null/zero cases,” “special structure cases,” and “time complexity testing cases”.
+
+### Examples
+**Problem Statement**:
+There is a legendary tale about Dragon Balls on Planet X: if one collects seven Dragon Balls, the Dragon God will show up and help you fulfill your wishes.\n\nOne day, you are surprised to discover that the tale might possibly be true: you found a Dragon Ball radar at a flea market! The radar shows you the locations of the seven Dragon Balls on Planet X. You want to waste no time checking the truth of the old legend about wish-granting for yourself!\n\nThere are $n$ cities in total on the Planet X, numbered from $1$ to $n$. You are currently at city $1$. To travel from one city to another, you can take any of $m$ bidirectional teleport trips, as many times as you like. The $i$-th teleporter costs $t_ i$ coins to use each time, and it can teleport you between cities $a_ i$ and $b_ i$. To collect a Dragon Ball, you simply need to visit the city where it\u2019s located, as indicated on your radar. It is possible that multiple Dragon Balls are at the same city; in this case you pick all of them all up at once if you visit that city.
+
+
+**Metadata**:
+Input:
+n (int): The number of cities. Constraints: 1 <= n <= 200000
+m (int): The number of possible teleport trips. Constraints: 1 <= m <= 200000
+trips_costs (list[tuple[int, int, int]]): A list of tuples, where each tuple consists of a_i, b_i, t_i: he two cities connected by the teleport trip and the cost to use the teleporter, respectively. There are m sets of these values. Constraints: 1 <= a_i, b_i <= n, 0 <= t_i <= 10000
+c (list[int]): The city IDs of the seven Dragon Balls shown on the radar. Constraints: 1 <= c[i] <= n for each i from 1 to 7. Length 7
+
+Output:
+min_coins (int): The minimum number of coins needed to collect all seven Dragon Balls shown on the radar. If there is no way to complete this task, print -1 instead.
+
+
+**Golden Unit Yests**:
+Sample Input 1:
+n = 10
+m = 9
+trips_costs = [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)]
+c = [1, 2, 3, 4, 5, 6, 7]
+Sample Output 1:
+min_coins = 6
+Explanation: The minimum number of coins needed to collect all seven Dragon Balls shown on the radar is 6.
+
+Sample Input 2:
+n = 5
+m = 5
+trips_costs = [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)]
+c = [1, 2, 1, 2, 3, 4, 4]
+Sample Output 2:
+min_coins = 1
+Explanation: The minimum number of coins needed to collect all seven Dragon Balls shown on the radar is 1.
+
+### Output
+**Problem Statement**:
+
+
+**Metadata**:
+
+
+**Golden Unit Tests**:
+"""
+
+
 REFINE_PROMPT = """Your task is to refine and improve a coding problem to make it clearer and higher quality than typical LeetCode questions. The problem should be unambiguous and engaging for coders.
 
 ### Instructions

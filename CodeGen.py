@@ -112,6 +112,14 @@ def main():
         
         This tool helps you generate high-quality coding questions using AI.
         
+        Follow these steps to create a coding challenge:
+        
+        1. **Generate Question**: Select categories and let AI create a unique coding problem
+        2. **Solve**: Use an AI system to solve the generated question
+        3. **Format**: Clean up and structure your code and make it executable
+        4. **Debug**: Test unit tests and fix any issues using AI Debug Assistance
+        5. **Review**: Validate that the generated problem and solution are correct and make any final adjustments before saving
+        
         You can either start a new question or continue working on a previous one from the History tab.
         """
         )

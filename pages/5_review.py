@@ -90,6 +90,17 @@ def save_final_challenge(challenge_text: str, question_id: str):
 
 def render_review_page():
     st.title("Review Solution")
+    st.markdown("""
+    Review your final solution and explore similar problems. Get an AI quality review of your code
+    and find related problems on LeetCode and other platforms to continue learning.
+    
+    **Steps:**
+    1. Review your final solution
+    2. Get an AI quality review
+    3. Find similar problems
+    4. Download your completed challenge
+    5. Mark the challenge as complete
+    """)
 
     initialize_session_state()
 

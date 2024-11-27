@@ -9,6 +9,16 @@ from utils.components import card
 
 def render_format_page():
     st.title("Format Solution")
+    st.markdown("""
+    Clean up and format your solution to ensure it follows best practices and is ready for testing.
+    The AI will help format your code according to PEP 8 standards and improve its readability.
+    
+    **Steps:**
+    1. Review your current solution
+    2. Format the solution
+    3. Review and edit the formatted code
+    4. Save and continue to debugging
+    """)
 
     initialize_session_state()
 

@@ -19,6 +19,17 @@ from utils.components import card
 
 def render_generate_page():
     st.title("Generate Coding Question")
+    st.markdown("""
+    Start by selecting 1-3 problem categories to generate a custom coding challenge. 
+    Once generated, you can review and edit the question before proceeding to solve it.
+    
+    **Steps:**
+    1. Select problem categories
+    2. Generate a question
+    3. Review and edit if needed
+    4. Validate unit tests
+    5. Proceed to solving
+    """)
 
     # Initialize session state
     initialize_session_state()

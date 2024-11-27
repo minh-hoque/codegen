@@ -20,6 +20,17 @@ from utils.solution_tester import TestResult
 
 def render_debug_page():
     st.title("Debug Solution")
+    st.markdown("""
+    Test and debug your solution to ensure it works correctly. Run the test cases to verify your solution, 
+    and use the AI Debug Assistant if you need help fixing any issues.
+    
+    **Steps:**
+    1. Run the test cases
+    2. Review test results
+    3. Use AI Debug Help if needed
+    4. Apply suggested fixes
+    5. Re-run tests to verify fixes
+    """)
 
     initialize_session_state()
 

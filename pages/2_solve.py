@@ -7,6 +7,17 @@ from utils.components import card
 
 def render_solve_page():
     st.title("Solve Coding Question")
+    st.markdown("""
+    Here you can generate an AI solution for your coding challenge or write your own. 
+    Review the generated solution, make any necessary edits, and validate the unit tests before proceeding.
+    
+    **Steps:**
+    1. Review the question
+    2. Generate an AI solution or write your own
+    3. Edit the solution if needed
+    4. Validate unit tests
+    5. Save and proceed to formatting
+    """)
 
     initialize_session_state()
 

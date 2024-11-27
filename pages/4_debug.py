@@ -63,7 +63,27 @@ def render_debug_page():
 
     st.markdown("### Debug Solution")
     st.markdown(f"Solution file: `{challenge_file}`")
-    st.code(saved_solution, language="python")
+    
+    # Replace st.code with st.text_area for editing
+    edited_solution = st.text_area(
+        "Edit your solution here:",
+        value=saved_solution,
+        height=400,
+        key="solution_editor"
+    )
+
+    # Save changes when the solution is edited
+    if edited_solution != saved_solution:
+        try:
+            with open(challenge_path, "w") as f:
+                f.write(edited_solution)
+            set_state_value("saved_solution", edited_solution)
+            st.success("Changes saved successfully!")
+        except Exception as e:
+            st.error(f"Error saving changes: {str(e)}")
+    
+    # Update saved_solution to use edited version
+    saved_solution = edited_solution
 
     # Add debug controls
     if st.button("Run Tests"):

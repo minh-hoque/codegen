@@ -626,7 +626,7 @@ problem_statement = \"""
 metadata = Metadata(
     statement=problem_statement,
     approx_leetcode_level=LeetcodeLevel.[MEDIUM/HARD],
-    categories=[
+    categories=[Select the correct categories from the list of categories below:
 {categories}
     ],
     inputs=[
@@ -655,7 +655,7 @@ def solution(param1: Type1, param2: Type2) -> ReturnType:
     # Solution implementation
     pass
 
-Please format the following problem information into this structure:
+Please format the following problem information into the Python module format above and select the correct categories from the list of categories:
 {information}
 """
 

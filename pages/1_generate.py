@@ -37,7 +37,7 @@ def render_generate_page():
     )
 
     if st.button("Generate Question") and categories:
-        if len(categories) > 3:
+        if len(categories) >= 3:
             st.error("Please select between 1-3 categories")
         else:
             # Clear previous session state when generating new question

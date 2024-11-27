@@ -37,7 +37,7 @@ def show_history():
         }.get(q.get("status", ""), "❓")
 
         with st.expander(
-            f"{status_emoji} Question from {q.get('created_at', '')[:10]} - {q.get('status', 'unknown')}"
+            f"{status_emoji} Question from {str(q.get('created_at', ''))[:10]} - {q.get('status', 'unknown')}"
         ):
             st.markdown("**Categories:** " + ", ".join(q.get("categories", [])))
             if q.get("generated_question"):

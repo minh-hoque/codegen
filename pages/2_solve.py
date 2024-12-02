@@ -7,7 +7,8 @@ from utils.components import card
 
 def render_solve_page():
     st.title("Solve Coding Question")
-    st.markdown("""
+    st.markdown(
+        """
     Here you can generate an AI solution for your coding challenge or write your own. 
     Review the generated solution, make any necessary edits, and validate the unit tests before proceeding.
     
@@ -17,7 +18,8 @@ def render_solve_page():
     3. Edit the solution if needed
     4. Validate unit tests
     5. Save and proceed to formatting
-    """)
+    """
+    )
 
     initialize_session_state()
 
@@ -40,6 +42,7 @@ def render_solve_page():
             result = solve_problem(client, str(st.session_state.generated_question))
             if result and result["status"] == "success":
                 set_state_value("solution_text", result["generated_text"])
+                set_state_value("validate_clicked", False)
                 save_progress()
             else:
                 st.error("Failed to generate solution. Please try again.")
@@ -51,12 +54,20 @@ def render_solve_page():
         edited_solution = st.text_area(
             "Review and Edit Solution",
             value=st.session_state.solution_text,
-            height=400,
+            height=800,
         )
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Validate Unit Tests") and edited_solution:
+            # Update the validate_clicked state when button is pressed
+            if (
+                st.button("Validate Unit Tests", key="validate_button")
+                and edited_solution
+            ):
+                set_state_value("validate_clicked", True)
+
+            # Check either button press or existing state
+            if st.session_state.validate_clicked and edited_solution:
                 with st.spinner("Analyzing unit tests..."):
                     validation_result = validate_unit_tests(
                         client, edited_solution, model="o1-preview", temperature=1
@@ -75,6 +86,7 @@ def render_solve_page():
             if st.button("Save and Proceed to Format"):
                 set_state_value("solution", edited_solution)
                 set_state_value("solve_completed", True)  # Mark solve step as completed
+                set_state_value("validate_clicked", False)
                 save_progress()
                 st.switch_page("pages/3_format.py")
 

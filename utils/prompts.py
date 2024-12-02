@@ -154,38 +154,51 @@ To generate a high-quality coding problem, follow these steps:
 
 ### Examples
 **Problem Statement**:
-There is a legendary tale about Dragon Balls on Planet X: if one collects seven Dragon Balls, the Dragon God will show up and help you fulfill your wishes.\n\nOne day, you are surprised to discover that the tale might possibly be true: you found a Dragon Ball radar at a flea market! The radar shows you the locations of the seven Dragon Balls on Planet X. You want to waste no time checking the truth of the old legend about wish-granting for yourself!\n\nThere are $n$ cities in total on the Planet X, numbered from $1$ to $n$. You are currently at city $1$. To travel from one city to another, you can take any of $m$ bidirectional teleport trips, as many times as you like. The $i$-th teleporter costs $t_ i$ coins to use each time, and it can teleport you between cities $a_ i$ and $b_ i$. To collect a Dragon Ball, you simply need to visit the city where it\u2019s located, as indicated on your radar. It is possible that multiple Dragon Balls are at the same city; in this case you pick all of them all up at once if you visit that city.
+You are tasked with designing a futuristic city network on Planet Z using teleportation portals. The cities are arranged in a grid with n rows and m columns. Each cell in the grid represents a city, and you can teleport between adjacent cities (horizontally or vertically) if there is an operational portal connecting them. Each portal has a fixed energy cost associated with it. Your mission is to determine the minimum energy cost required to travel from the top-left city (1, 1) to the bottom-right city (n, m). If it is not possible to reach the destination, return -1.
 
 
 **Metadata**:
 Input:
-n (int): The number of cities. Constraints: 1 <= n <= 200000
-m (int): The number of possible teleport trips. Constraints: 1 <= m <= 200000
-trips_costs (list[tuple[int, int, int]]): A list of tuples, where each tuple consists of a_i, b_i, t_i: he two cities connected by the teleport trip and the cost to use the teleporter, respectively. There are m sets of these values. Constraints: 1 <= a_i, b_i <= n, 0 <= t_i <= 10000
-c (list[int]): The city IDs of the seven Dragon Balls shown on the radar. Constraints: 1 <= c[i] <= n for each i from 1 to 7. Length 7
+n (int): The number of rows in the grid. Constraints: 1 <= n <= 1000.
+m (int): The number of columns in the grid. Constraints: 1 <= m <= 1000.
+portals (list[tuple[int, int, int, int, int]]): A list of tuples where each tuple represents a portal. The tuple format is (x1, y1, x2, y2, cost), indicating a portal connecting city (x1, y1) to city (x2, y2) with an energy cost of cost. Constraints: 1 <= x1, x2 <= n, 1 <= y1, y2 <= m, 0 <= cost <= 10^6.
 
 Output:
-min_coins (int): The minimum number of coins needed to collect all seven Dragon Balls shown on the radar. If there is no way to complete this task, print -1 instead.
+min_energy (int): The minimum energy required to travel from (1, 1) to (n, m). Return -1 if the destination is unreachable.
 
 
-**Golden Unit Yests**:
+**Golden Unit Tests**:
 Sample Input 1:
-n = 10
-m = 9
-trips_costs = [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)]
-c = [1, 2, 3, 4, 5, 6, 7]
+n = 3  
+m = 3  
+portals = [
+    (1, 1, 1, 2, 2),  
+    (1, 2, 1, 3, 3),  
+    (1, 3, 2, 3, 2),  
+    (2, 3, 3, 3, 1)  
+]  
 Sample Output 1:
-min_coins = 6
-Explanation: The minimum number of coins needed to collect all seven Dragon Balls shown on the radar is 6.
+min_energy = 8  
+Explanation: The optimal path is (1, 1) -> (1, 2) -> (1, 3) -> (2, 3) -> (3, 3) with a total energy cost of 2 + 3 + 2 + 1 = 8.
 
 Sample Input 2:
-n = 5
-m = 5
-trips_costs = [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)]
-c = [1, 2, 1, 2, 3, 4, 4]
+n = 2  
+m = 2  
+portals = [
+    (1, 1, 1, 2, 5),  
+    (1, 2, 2, 2, 5)  
+]  
 Sample Output 2:
-min_coins = 1
-Explanation: The minimum number of coins needed to collect all seven Dragon Balls shown on the radar is 1.
+min_energy = -1  
+Explanation: It is impossible to reach (2, 2) from (1, 1) because there is no portal connecting (2, 2) to any adjacent city.
+
+Sample Input 3:
+n = 1  
+m = 1  
+portals = []  
+Sample Output 3:
+min_energy = 0  
+Explanation: Starting and ending at the same city requires no energy.
 
 ### Output
 **Problem Statement**:

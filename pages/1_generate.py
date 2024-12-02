@@ -125,7 +125,15 @@ def render_generate_page():
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("Validate Unit Tests") and edited_question:
+            # Update the validate_clicked state when button is pressed
+            if (
+                st.button("Validate Unit Tests", key="validate_button")
+                and edited_question
+            ):
+                st.session_state.validate_clicked = True
+
+            # Check either button press or existing state
+            if st.session_state.validate_clicked and edited_question:
                 with st.spinner("Analyzing unit tests..."):
                     validation_result = validate_unit_tests(client, edited_question)
                     if validation_result and validation_result["status"] == "success":

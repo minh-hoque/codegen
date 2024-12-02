@@ -55,6 +55,8 @@ def initialize_session_state():
         st.session_state.similarity_analysis = None
     if "selected_theme" not in st.session_state:
         st.session_state.selected_theme = None
+    if "validate_clicked" not in st.session_state:
+        st.session_state.validate_clicked = False
 
 
 def get_state_value(key: str) -> Optional[Any]:
@@ -173,6 +175,7 @@ def clear_session_state():
         "review_completed",
         "similar_problems",
         "similarity_analysis",
+        "validate_clicked",
     ]
     for key in keys_to_clear:
         if key in st.session_state:

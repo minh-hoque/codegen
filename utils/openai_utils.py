@@ -1,5 +1,6 @@
 from typing import Optional, Dict, Any, List
 from openai import OpenAI
+from anthropic import Anthropic
 import streamlit as st
 from utils.prompts import (
     GENERATE_PROMPT,
@@ -53,8 +54,41 @@ def query_openai(
 
 
 @st.cache_data(ttl=3600)
+def query_anthropic(
+    prompt: str,
+    system_message: Optional[str] = None,
+    temperature: float = 0.8,
+    max_tokens: Optional[int] = None,
+    model: str = "claude-3-5-sonnet-20241022",
+) -> Dict[str, Any]:
+    """Generic helper function to query Anthropic Claude 3.5 Sonnet model."""
+    try:
+        client = Anthropic()
+
+        messages = []
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+        messages.append({"role": "user", "content": prompt})
+
+        response = client.messages.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+
+        return {
+            "generated_text": response.content,
+            "status": "success",
+        }
+    except Exception as e:
+        print(e)
+        return {"generated_text": str(e), "status": "error"}
+
+
+@st.cache_data(ttl=3600)
 def generate_question(
-    _client: Optional[OpenAI], categories: List[str]
+    _client: Optional[OpenAI], categories: List[str], selected_theme: str
 ) -> Dict[str, Any]:
     """Generate a coding question using GPT-4"""
     if not _client:
@@ -62,7 +96,9 @@ def generate_question(
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
     categories_str = ", ".join(categories)
-    prompt = GENERATE_PROMPT.format(selected_category=categories_str)
+    prompt = GENERATE_PROMPT.format(
+        selected_category=categories_str, selected_theme=selected_theme
+    )
     return query_openai(_client, prompt, temperature=0.8)
 
 
@@ -149,6 +185,7 @@ def get_completion(
 def review_solution(
     _client: Optional[OpenAI],
     solution_text: str,
+    selected_theme: str,
     model: str = "gpt-4o",
     temperature: float = 0,
 ) -> Dict[str, Any]:
@@ -156,7 +193,9 @@ def review_solution(
     if not _client:
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
-    prompt = REVIEW_SOLUTION_PROMPT.format(solution=solution_text)
+    prompt = REVIEW_SOLUTION_PROMPT.format(
+        solution=solution_text, selected_theme=selected_theme
+    )
     return query_openai(
         _client=_client, prompt=prompt, model=model, temperature=temperature
     )

@@ -68,7 +68,10 @@ def get_solution_review(solution_text):
     """Get AI review of the solution"""
     client = init_openai()
     try:
-        response = review_solution(client, solution_text)
+        theme = get_state_value("selected_theme")
+        response = review_solution(
+            _client=client, solution_text=solution_text, selected_theme=theme
+        )
         return response["generated_text"] if response["status"] == "success" else None
     except Exception as e:
         st.error(f"Error getting solution review: {str(e)}")
@@ -90,7 +93,8 @@ def save_final_challenge(challenge_text: str, question_id: str):
 
 def render_review_page():
     st.title("Review Solution")
-    st.markdown("""
+    st.markdown(
+        """
     Review your final solution and explore similar problems. Get an AI quality review of your code
     and find related problems on LeetCode and other platforms to continue learning.
     
@@ -100,7 +104,8 @@ def render_review_page():
     3. Find similar problems
     4. Download your completed challenge
     5. Mark the challenge as complete
-    """)
+    """
+    )
 
     initialize_session_state()
 

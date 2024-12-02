@@ -8,14 +8,14 @@ Each coding problem should have the following components, specified and submitte
 - The solution is self-contained, fully executable, and testable with independent unit tests
 - The solution relies only on Python standard library capabilities
 - The problem statement is coding language-agnostic. It should be able to be solved with any programming language.
-- The problem statement describes a creative scenario that requires the reader to interpret and map to a coding problem; see example below.
+- The problem statement describes a {selected_theme} scenario that requires the reader to interpret and map to a coding problem; see example below.
 - The required coding task can correspond to problems like those in coding competitions, or can be reflective of more real-world software engineering problems
 - The difficulty of the task should correspond roughly to either “Medium” or “Hard” Leetcode questions.
 - Assure that the problem statement is has all required information to solve the problem for the user.
 
 2. Metadata
 - Input/output spec: Should be stated concisely. Specify the input and output variables and their types.
-- Constraints: Contraints about the variables should be stated accurately.
+- Constraints: Constraints about the variables should be stated accurately.
 - Approximate difficulty level: Either Leetcode “Medium” or “Hard” (approximately), see above.
 - Problem Category: The category of the coding problem needs to be {selected_category}
 - Approximate time: time taken, in minutes, from creating the question to submitting it (code running, tests, etc.)
@@ -31,7 +31,7 @@ Each coding problem should have the following components, specified and submitte
 - The problem statement describes a coding problem with a solution that is checkable by a reasonable number of unit tests.
 - The problem statement describes a coding problem in a language agnostic way.
 - The problem statement describes a coding problem that corresponds roughly to the difficulty level of a Leetcode Medium or Hard problem based on the algorithms and data structures needed to solve the problem.
-- The problem statement describes a scenario (either real-world or more creative) that requires reading comprehension and critical thinking to map to a software specification.
+- The problem statement describes a {selected_theme} scenario that requires reading comprehension and critical thinking to map to a software specification.
 - The problem statement must be correctly formatted and grammatically correct, have no misspellings, be well written, etc.
 - The problem statement must not be plagiarized- i.e. it cannot be a literal copy of any existing coding challenge problem statement, or a minimally re-worded or transformed version of one.
 - The problem statement should be of the coding category {selected_category}
@@ -108,11 +108,10 @@ To generate a high-quality coding problem, follow these steps:
    - Write a clear, challenging, natural-language description of a coding problem that needs to be of the category {selected_category}.
    - Ensure the problem is **fully executable**, **testable** with unit tests.
    - Make the problem language-agnostic. It should be solvable in any programming language.
-   - Use creative or real-world scenarios requiring interpretation and mapping to a coding solution.
+   - Use {selected_theme} scenarios requiring interpretation and mapping to a coding solution.
    - Ensure the problem corresponds to a **Medium** or **Hard** difficulty level (comparable to Leetcode) and requires algorithmic thinking or data structure usage.
    - Include all necessary information to enable the user to solve the problem without assumptions.
    - Make sure the problem statement is not a copy of the examples or of an existing Leetcode coding problem.
-   
 
 2. **Provide Metadata**:
    - Specify input/output types and constraints.
@@ -139,7 +138,7 @@ To generate a high-quality coding problem, follow these steps:
 - Should not rely on external libraries (use only Python’s standard library).
 - DO NOT plagiarize existing Leetcode coding problems.
 - Do not copy the provided examples.
-- Should include scenarios requiring logical reasoning and algorithmic problem-solving.
+- Should include {selected_theme} scenarios requiring logical reasoning and algorithmic problem-solving.
 - Clearly formatted, grammatically correct, and free of errors.
 
 #### Metadata
@@ -209,7 +208,7 @@ REFINE_PROMPT = """Your task is to refine and improve a coding problem to make i
    - Adding helpful examples where needed.
    - Making constraints explicit and well-justified under the metadata section.
    - Ensuring unit tests cover all important cases.
-3. Maintain the same core problem and difficulty level
+3. Maintain the same core problem, difficulty level, and theme
 4. Keep the format consistent with the original input problem
 
 ### Format
@@ -241,7 +240,7 @@ The Output format should follow:
    - No duplicate tests
    - No mistakes in the unit tests
 
-### Output Format
+### Output
 **Problem Statement**:
 [Refined problem statement]
 
@@ -571,7 +570,7 @@ REVIEW_SOLUTION_PROMPT = """Review the following python coding problem and solut
 - Solution is checkable by a reasonable number of unit tests.
 - Problem is described in a language-agnostic way.
 - Difficulty level corresponds to Leetcode Medium or Hard.
-- Describes a scenario requiring reading comprehension and critical thinking.
+- Describes a {selected_theme} scenario requiring reading comprehension and critical thinking.
 - Well-written, correctly formatted, and grammatically correct.
 - Not plagiarized from existing Leetcode coding challenges.
 

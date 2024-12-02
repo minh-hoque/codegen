@@ -53,6 +53,8 @@ def initialize_session_state():
         st.session_state.similar_problems = None
     if "similarity_analysis" not in st.session_state:
         st.session_state.similarity_analysis = None
+    if "selected_theme" not in st.session_state:
+        st.session_state.selected_theme = None
 
 
 def get_state_value(key: str) -> Optional[Any]:
@@ -77,6 +79,9 @@ def save_progress():
         "selected_category": st.session_state.get(
             "selected_category"
         ),  # Changed from selected_categories
+        "selected_theme": st.session_state.get(
+            "selected_theme"
+        ),  # Add theme to saved state
         "generated_text": st.session_state.get("generated_text"),  # generate step
         "generated_question": st.session_state.get(
             "generated_question"

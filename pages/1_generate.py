@@ -19,7 +19,8 @@ from utils.components import card
 
 def render_generate_page():
     st.title("Generate Coding Question")
-    st.markdown("""
+    st.markdown(
+        """
     Start by selecting 1-3 problem categories to generate a custom coding challenge. 
     Once generated, you can review and edit the question before proceeding to solve it.
     
@@ -29,7 +30,8 @@ def render_generate_page():
     3. Review and edit if needed
     4. Validate unit tests
     5. Proceed to solving
-    """)
+    """
+    )
 
     # Initialize session state
     initialize_session_state()
@@ -47,6 +49,21 @@ def render_generate_page():
         max_selections=3,
     )
 
+    # Add theme selection
+    themes = [
+        "Fantasy",
+        "Real-world",
+        "Sports",
+        "Science Fiction",
+        "Historical",
+    ]
+    selected_theme = st.selectbox(
+        "Select Question Theme",
+        options=themes,
+        help="Choose a theme for your coding problem. This will affect the context and story of the question.",
+    )
+    set_state_value("selected_theme", selected_theme)
+
     if st.button("Generate Question") and categories:
         if len(categories) >= 3:
             st.error("Please select between 1-3 categories")
@@ -58,8 +75,10 @@ def render_generate_page():
                 category_values = [
                     LEETCODE_CATEGORY_MAP[category] for category in categories
                 ]
-                # Initial generation
-                initial_result = generate_question(client, category_values)
+                # Pass theme to generate_question
+                initial_result = generate_question(
+                    client, category_values, selected_theme
+                )
 
                 if initial_result and initial_result["status"] == "success":
                     # Show initial result in expander

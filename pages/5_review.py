@@ -20,6 +20,8 @@ from tavily import TavilyClient
 from utils.components import card
 from dotenv import load_dotenv
 
+load_dotenv()
+
 
 def search_leetcode_similarity(question_text, category=None):
     """
@@ -69,6 +71,7 @@ def get_solution_review(solution_text):
     client = init_openai()
     try:
         theme = get_state_value("selected_theme")
+        print(f"Theme: {theme}")
         response = review_solution(
             _client=client, solution_text=solution_text, selected_theme=theme
         )
@@ -127,13 +130,6 @@ def render_review_page():
 
     st.markdown("### Review Final Solution")
 
-    # # Original question and solution display
-    # with st.expander("View Original Question", expanded=True):
-    #     if generated_question:
-    #         card(generated_question, "review_question_card")
-    #         if selected_categories:
-    #             st.info(f"Category: {selected_categories}")
-
     with st.expander("View Final Solution", expanded=True):
         st.code(saved_solution, language="python")
 
@@ -146,7 +142,9 @@ def render_review_page():
         if st.button("Generate Solution Review"):
             with st.spinner("Analyzing solution quality..."):
                 try:
-                    response = review_solution(client, saved_solution)
+                    theme = get_state_value("selected_theme")
+                    print(f"Theme: {theme}")
+                    response = review_solution(client, saved_solution, theme)
                     review_result = (
                         response["generated_text"]
                         if response["status"] == "success"
@@ -185,7 +183,7 @@ def render_review_page():
                                 "Could not find problem statement in challenge file"
                             )
                             return
-
+                        print(os.getenv("TAVILY_API_KEY"))
                         tavily_client = TavilyClient(os.getenv("TAVILY_API_KEY"))
                         search_results = get_similar_problems_context(
                             problem_statement, tavily_client

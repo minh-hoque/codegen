@@ -284,116 +284,95 @@ SOLVE_SOLUTION_PROMPT = """Your task is to create a correct solution to the prob
 
 ### Examples
 **Problem Statement**:
-There is a legendary tale about Dragon Balls on Planet X: if one collects seven Dragon Balls, the Dragon God will show up and help you fulfill your wishes.\n\nOne day, you are surprised to discover that the tale might possibly be true: you found a Dragon Ball radar at a flea market! The radar shows you the locations of the seven Dragon Balls on Planet X. You want to waste no time checking the truth of the old legend about wish-granting for yourself!\n\nThere are $n$ cities in total on the Planet X, numbered from $1$ to $n$. You are currently at city $1$. To travel from one city to another, you can take any of $m$ bidirectional teleport trips, as many times as you like. The $i$-th teleporter costs $t_ i$ coins to use each time, and it can teleport you between cities $a_ i$ and $b_ i$. To collect a Dragon Ball, you simply need to visit the city where it\u2019s located, as indicated on your radar. It is possible that multiple Dragon Balls are at the same city; in this case you pick all of them all up at once if you visit that city.
-
+You are tasked with designing a futuristic city network on Planet Z using teleportation portals. The cities are arranged in a grid with n rows and m columns. Each cell in the grid represents a city, and you can teleport between adjacent cities (horizontally or vertically) if there is an operational portal connecting them. Each portal has a fixed energy cost associated with it. Your mission is to determine the minimum energy cost required to travel from the top-left city (1, 1) to the bottom-right city (n, m). If it is not possible to reach the destination, return -1.
 
 **Metadata**:
-n (int): The number of cities. Constraints: 1 <= n <= 200000
-m (int): The number of possible teleport trips. Constraints: 1 <= m <= 200000
-trips_costs (list[tuple[int, int, int]]): A list of tuples, where each tuple consists of a_i, b_i, t_i: he two cities connected by the teleport trip and the cost to use the teleporter, respectively. There are m sets of these values. Constraints: 1 <= a_i, b_i <= n, 0 <= t_i <= 10000
-c (list[int]): The city IDs of the seven Dragon Balls shown on the radar. Constraints: 1 <= c[i] <= n for each i from 1 to 7. Length 7
-
+n (int): The number of rows in the grid. Constraints: 1 <= n <= 1000.
+m (int): The number of columns in the grid. Constraints: 1 <= m <= 1000.
+portals (list[tuple[int, int, int, int, int]]): A list of tuples where each tuple represents a portal. The tuple format is (x1, y1, x2, y2, cost), indicating a portal connecting city (x1, y1) to city (x2, y2) with an energy cost of cost. Constraints: 1 <= x1, x2 <= n, 1 <= y1, y2 <= m, 0 <= cost <= 10^6.
 
 **Correct Solution**:
-min_coins (int): The minimum number of coins needed to collect all seven Dragon Balls shown on the radar. If there is no way to complete this task, print -1 instead.
 ```python
-from typing import List, Tuple, Dict
+from typing import List, Tuple
+from collections import defaultdict
 import heapq
 
-def solution(n: int, m: int, trips_costs: List[Tuple[int, int, int]], c: List[int]) -> int:
-    if len(c) != 7:
-        return -1  # There must be exactly seven Dragon Balls
+def solution(n: int, m: int, portals: List[Tuple[int, int, int, int, int]]) -> int:
+    # Special case: Start and end city are the same
+    # (No movement needed => 0 energy)
+    if n == 1 and m == 1:
+        return 0
 
-    INF = float('inf')
+    # Adjacency list: For each city (x, y), store a list of (nx, ny, cost) for all portals
+    adjacency = defaultdict(list)
+    for (x1, y1, x2, y2, cost) in portals:
+        adjacency[(x1, y1)].append((x2, y2, cost))
 
-    # Build the graph
-    graph = [[] for _ in range(n + 1)]
-    for a_i, b_i, t_i in trips_costs:
-        graph[a_i].append((b_i, t_i))
-        graph[b_i].append((a_i, t_i))
+    # Use Dijkstra's algorithm to find the shortest path from (1, 1) to (n, m)
 
-    # Build a mapping from cities to the set of Dragon Balls located there
-    city_to_balls: Dict[int, int] = {{}}
-    for idx, city in enumerate(c):
-        if city not in city_to_balls:
-            city_to_balls[city] = 0
-        city_to_balls[city] |= (1 << idx)
+    # Distances dictionary to keep track of the minimum cost to reach each city
+    dist = {{}}
+    dist[(1, 1)] = 0
 
-    # Dijkstra to calculate shortest paths from any source
-    def dijkstra(source: int) -> List[int]:
-        dist = [INF] * (n + 1)
-        dist[source] = 0
-        hq = [(0, source)]
-        while hq:
-            d, u = heapq.heappop(hq)
-            if dist[u] < d:
-                continue
-            for v, w in graph[u]:
-                if dist[v] > dist[u] + w:
-                    dist[v] = dist[u] + w
-                    heapq.heappush(hq, (dist[v], v))
-        return dist
+    # Min-heap (priority queue) for retrieving the current city with the smallest distance
+    # Each item is a tuple: (current_distance, (x, y))
+    heap = [(0, (1, 1))]
 
-    # Relevant cities: 1 and the unique cities in c
-    relevant_cities = list(set([1] + c))
-    city_idx_map = {{city: idx for idx, city in enumerate(relevant_cities)}}
-    num_cities = len(relevant_cities)
+    # Process the heap until empty or until we pop (n, m)
+    while heap:
+        current_dist, (cx, cy) = heapq.heappop(heap)
 
-    # Distance matrix between relevant cities
-    dist_matrix = [[INF] * num_cities for _ in range(num_cities)]
-    for i, city in enumerate(relevant_cities):
-        dist = dijkstra(city)
-        for j, other_city in enumerate(relevant_cities):
-            dist_matrix[i][j] = dist[other_city]
-
-    # DP array: dp[mask][city_idx] = min cost to reach city_idx with Dragon Balls collected as per mask
-    size = 1 << 7  # Total possible combinations of Dragon Balls collected (7 balls)
-    dp = [[INF] * num_cities for _ in range(size)]
-
-    # Initial state: at city 1 with any Dragon Balls available there
-    start_city_idx = city_idx_map[1]
-    initial_mask = city_to_balls.get(1, 0)
-    dp[initial_mask][start_city_idx] = 0
-    hq = [(0, initial_mask, start_city_idx)]  # Min-heap for Dijkstra's algorithm over states
-
-    while hq:
-        cost, mask, u_idx = heapq.heappop(hq)
-        if dp[mask][u_idx] < cost:
+        # If this distance is outdated, skip
+        if current_dist > dist[(cx, cy)]:
             continue
 
-        # Collect any new Dragon Balls at the current city
-        new_mask = mask | city_to_balls.get(relevant_cities[u_idx], 0)
+        # If we've reached (n, m), return the distance immediately
+        if (cx, cy) == (n, m):
+            return current_dist
 
-        # Try moving to other relevant cities
-        for v_idx in range(num_cities):
-            next_cost = cost + dist_matrix[u_idx][v_idx]
-            if dp[new_mask][v_idx] > next_cost:
-                dp[new_mask][v_idx] = next_cost
-                heapq.heappush(hq, (next_cost, new_mask, v_idx))
+        # Relaxation step for all neighbors
+        for nx, ny, cost in adjacency[(cx, cy)]:
+            new_dist = current_dist + cost
+            if new_dist < dist.get((nx, ny), float('inf')):
+                dist[(nx, ny)] = new_dist
+                heapq.heappush(heap, (new_dist, (nx, ny)))
 
-    # Find the minimum cost to collect all Dragon Balls
-    full_mask = (1 << 7) - 1
-    result = min(dp[full_mask][u_idx] for u_idx in range(num_cities))
-
-    return result if result < INF else -1
+    # If (n, m) was never reached, return -1
+    return -1
 ```
 
 **Golden unit tests**:
 Sample Input 1:
-n = 10
-m = 9
-trips_costs = [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)]
-c = [1, 2, 3, 4, 5, 6, 7]
+n = 3  
+m = 3  
+portals = [
+    (1, 1, 1, 2, 2),  
+    (1, 2, 1, 3, 3),  
+    (1, 3, 2, 3, 2),  
+    (2, 3, 3, 3, 1)  
+]  
 Sample Output 1:
-min_coins = 6
+min_energy = 8  
+Explanation: The optimal path is (1, 1) -> (1, 2) -> (1, 3) -> (2, 3) -> (3, 3) with a total energy cost of 2 + 3 + 2 + 1 = 8.
 
 Sample Input 2:
-n = 5
-m = 5
-trips_costs = [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)]
-c = [1, 2, 1, 2, 3, 4, 4]
+n = 2  
+m = 2  
+portals = [
+    (1, 1, 1, 2, 5),  
+    (1, 2, 2, 2, 5)  
+]  
 Sample Output 2:
-min_coins = 1
+min_energy = -1  
+Explanation: It is impossible to reach (2, 2) from (1, 1) because there is no portal connecting (2, 2) to any adjacent city.
+
+Sample Input 3:
+n = 1  
+m = 1  
+portals = []  
+Sample Output 3:
+min_energy = 0  
+Explanation: Starting and ending at the same city requires no energy.
 
 ### Output format
 Output should follow the following format:
@@ -408,147 +387,6 @@ Output should follow the following format:
 ### Output
 """
 
-OLD_SOLVE_SOLUTION_PROMPT = """Check if the following solution and unit tests are correct to solve the problem statement. The solution should be an approximately time- and space-optimal solution and it should have high-quality comments. The coding problem should be LEETCODE Medium or Hard level. If it is not, make it more complex.
-If the problem statement, solution or unit tests are not correct, fix them.
-
-### Instructions
-**Correct solution**:
-- Should be an approximately time- and space-optimal solution. If there is no single solution that is both time- and space-optimal, use your best judgment.
-- The function implementing the correct solution should be in Python and use only standard libraries. (Note: if you feel it would be beneficial to add a common, non-standard library, please notify the organizers.)
-- The function implementing the correct solution should be type-annotated (if applicable).
-
-### Requirements
-#### Correct solution
-- The solution should be correct.
-- The solution should be an approximately time- and space-optimal solution, or the best in your judgment.
-- The function implementing the correct solution should be in Python and use only standard libraries.
-- The function implementing the correct solution should be type-annotated (if applicable). 
-
-### Examples
-**Problem Statement**:
-There is a legendary tale about Dragon Balls on Planet X: if one collects seven Dragon Balls, the Dragon God will show up and help you fulfill your wishes.\n\nOne day, you are surprised to discover that the tale might possibly be true: you found a Dragon Ball radar at a flea market! The radar shows you the locations of the seven Dragon Balls on Planet X. You want to waste no time checking the truth of the old legend about wish-granting for yourself!\n\nThere are $n$ cities in total on the Planet X, numbered from $1$ to $n$. You are currently at city $1$. To travel from one city to another, you can take any of $m$ bidirectional teleport trips, as many times as you like. The $i$-th teleporter costs $t_ i$ coins to use each time, and it can teleport you between cities $a_ i$ and $b_ i$. To collect a Dragon Ball, you simply need to visit the city where it\u2019s located, as indicated on your radar. It is possible that multiple Dragon Balls are at the same city; in this case you pick all of them all up at once if you visit that city.
-
-
-**Metadata**:
-n (int): The number of cities. Constraints: 1 <= n <= 200000
-m (int): The number of possible teleport trips. Constraints: 1 <= m <= 200000
-trips_costs (list[tuple[int, int, int]]): A list of tuples, where each tuple consists of a_i, b_i, t_i: he two cities connected by the teleport trip and the cost to use the teleporter, respectively. There are m sets of these values. Constraints: 1 <= a_i, b_i <= n, 0 <= t_i <= 10000
-c (list[int]): The city IDs of the seven Dragon Balls shown on the radar. Constraints: 1 <= c[i] <= n for each i from 1 to 7. Length 7
-
-
-**Correct Solution**:
-min_coins (int): The minimum number of coins needed to collect all seven Dragon Balls shown on the radar. If there is no way to complete this task, print -1 instead.
-```python
-from typing import List, Tuple, Dict
-import heapq
-
-def solution(n: int, m: int, trips_costs: List[Tuple[int, int, int]], c: List[int]) -> int:
-    if len(c) != 7:
-        return -1  # There must be exactly seven Dragon Balls
-
-    INF = float('inf')
-
-    # Build the graph
-    graph = [[] for _ in range(n + 1)]
-    for a_i, b_i, t_i in trips_costs:
-        graph[a_i].append((b_i, t_i))
-        graph[b_i].append((a_i, t_i))
-
-    # Build a mapping from cities to the set of Dragon Balls located there
-    city_to_balls: Dict[int, int] = {{}}
-    for idx, city in enumerate(c):
-        if city not in city_to_balls:
-            city_to_balls[city] = 0
-        city_to_balls[city] |= (1 << idx)
-
-    # Dijkstra to calculate shortest paths from any source
-    def dijkstra(source: int) -> List[int]:
-        dist = [INF] * (n + 1)
-        dist[source] = 0
-        hq = [(0, source)]
-        while hq:
-            d, u = heapq.heappop(hq)
-            if dist[u] < d:
-                continue
-            for v, w in graph[u]:
-                if dist[v] > dist[u] + w:
-                    dist[v] = dist[u] + w
-                    heapq.heappush(hq, (dist[v], v))
-        return dist
-
-    # Relevant cities: 1 and the unique cities in c
-    relevant_cities = list(set([1] + c))
-    city_idx_map = {{city: idx for idx, city in enumerate(relevant_cities)}}
-    num_cities = len(relevant_cities)
-
-    # Distance matrix between relevant cities
-    dist_matrix = [[INF] * num_cities for _ in range(num_cities)]
-    for i, city in enumerate(relevant_cities):
-        dist = dijkstra(city)
-        for j, other_city in enumerate(relevant_cities):
-            dist_matrix[i][j] = dist[other_city]
-
-    # DP array: dp[mask][city_idx] = min cost to reach city_idx with Dragon Balls collected as per mask
-    size = 1 << 7  # Total possible combinations of Dragon Balls collected (7 balls)
-    dp = [[INF] * num_cities for _ in range(size)]
-
-    # Initial state: at city 1 with any Dragon Balls available there
-    start_city_idx = city_idx_map[1]
-    initial_mask = city_to_balls.get(1, 0)
-    dp[initial_mask][start_city_idx] = 0
-    hq = [(0, initial_mask, start_city_idx)]  # Min-heap for Dijkstra's algorithm over states
-
-    while hq:
-        cost, mask, u_idx = heapq.heappop(hq)
-        if dp[mask][u_idx] < cost:
-            continue
-
-        # Collect any new Dragon Balls at the current city
-        new_mask = mask | city_to_balls.get(relevant_cities[u_idx], 0)
-
-        # Try moving to other relevant cities
-        for v_idx in range(num_cities):
-            next_cost = cost + dist_matrix[u_idx][v_idx]
-            if dp[new_mask][v_idx] > next_cost:
-                dp[new_mask][v_idx] = next_cost
-                heapq.heappush(hq, (next_cost, new_mask, v_idx))
-
-    # Find the minimum cost to collect all Dragon Balls
-    full_mask = (1 << 7) - 1
-    result = min(dp[full_mask][u_idx] for u_idx in range(num_cities))
-
-    return result if result < INF else -1
-```
-
-**Golden unit tests**:
-Sample Input 1:
-n = 10
-m = 9
-trips_costs = [(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1)]
-c = [1, 2, 3, 4, 5, 6, 7]
-Sample Output 1:
-min_coins = 6
-
-Sample Input 2:
-n = 5
-m = 5
-trips_costs = [(1, 2, 0), (1, 3, 0), (2, 3, 1), (3, 4, 1), (4, 5, 1)]
-c = [1, 2, 1, 2, 3, 4, 4]
-Sample Output 2:
-min_coins = 1
-
-### Output format
-Output should follow the following format:
-**Problem Statement**:
-**Metadata**:
-**Correct Solution**:
-**Golden unit tests**:
-
-### Problem Statement
-{problem_statement}
-
-### Output
-"""
 
 DEBUG_SOLUTION_PROMPT = """Your task is to correct a python coding solution by debugging the solution and the failed unit tests.
 

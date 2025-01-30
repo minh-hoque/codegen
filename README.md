@@ -13,6 +13,16 @@ A Streamlit-based web application that generates, validates, and helps solve cod
 - **MongoDB Integration**: Persistent storage of questions and user progress
 - **Multi-user Support**: Handles concurrent users efficiently
 
+## 🚀 Workflow for Generating Coding Problems
+
+CodeGen employs a structured workflow to generate high-quality coding problems:
+
+1.  **Generate Question**:  The process begins with specifying problem categories and a theme.  AI is then utilized to create a unique coding problem based on these specifications.
+2.  **Solve**:  After generating a question, the next step involves developing a solution. Users can opt to generate an AI-powered solution or create their own implementation.
+3.  **Format**:  To ensure code quality and readability, the solution code is then formatted. This step helps in adhering to coding standards and improves the overall structure of the code.
+4.  **Debug**:  Rigorous testing is crucial. The solution is validated using unit tests, and debugging assistance is provided to resolve any identified issues.
+5.  **Review**:  The final stage is a comprehensive review of the generated problem and its solution. This step ensures the correctness and quality of the coding challenge before it is finalized and saved.
+
 ## 🛠 Tech Stack
 
 - Python 3.13
@@ -131,20 +141,3 @@ To migrate existing JSON data to MongoDB:
 ```bash
 python scripts/migrate_to_mongodb.py
 ```
-
-## 🚀 Workflow for Generating Coding Problems
-
-CodeGen employs a structured workflow to generate high-quality coding problems:
-
-1.  **Generate Question**:  The process begins with specifying problem categories and a theme.  AI is then utilized to create a unique coding problem based on these specifications.
-2.  **Solve**:  After generating a question, the next step involves developing a solution. Users can opt to generate an AI-powered solution or create their own implementation.
-3.  **Format**:  To ensure code quality and readability, the solution code is then formatted. This step helps in adhering to coding standards and improves the overall structure of the code.
-4.  **Debug**:  Rigorous testing is crucial. The solution is validated using unit tests, and debugging assistance is provided to resolve any identified issues.
-5.  **Review**:  The final stage is a comprehensive review of the generated problem and its solution. This step ensures the correctness and quality of the coding challenge before it is finalized and saved.
-
-## 🔒 Security Notes
-- Never commit sensitive credentials to version control
-- Use secure environment variables for API keys
-- Follow AWS security best practices for production deployments
-- Regularly update dependencies and system packages
-- Monitor application logs and performance

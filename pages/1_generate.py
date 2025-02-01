@@ -36,6 +36,10 @@ def render_generate_page():
     # Initialize session state
     initialize_session_state()
 
+    # Initialize validate_clicked if not present
+    if "validate_clicked" not in st.session_state:
+        st.session_state.validate_clicked = False
+
     # Show progress in sidebar
     sidebar_progress()
 

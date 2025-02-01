@@ -118,13 +118,15 @@ def validate_unit_tests(
 
 
 @st.cache_data(ttl=3600)
-def solve_problem(_client: Optional[OpenAI], problem_statement: str) -> Dict[str, Any]:
+def solve_problem(
+    _client: Optional[OpenAI], problem_statement: str, model: str = "o3-mini"
+) -> Dict[str, Any]:
     """Use OpenAI to solve the coding problem"""
     if not _client:
         return {"generated_text": "OpenAI client not initialized", "status": "error"}
 
     prompt = SOLVE_SOLUTION_PROMPT.format(problem_statement=problem_statement)
-    return query_openai(_client, prompt, model="o1-preview", temperature=1.0)
+    return query_openai(_client, prompt, model=model, temperature=1.0)
 
 
 @st.cache_data(ttl=3600)
@@ -149,7 +151,7 @@ def debug_solution(
     _client: Optional[OpenAI],
     solution: str,
     failed_tests: str,
-    model: str = "o1-preview",
+    model: str = "o3-mini",
     temperature: float = 1,
 ) -> Dict[str, Any]:
     """Get debugging suggestions for a solution using OpenAI."""

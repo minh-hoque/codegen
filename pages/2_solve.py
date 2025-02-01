@@ -70,7 +70,7 @@ def render_solve_page():
             if st.session_state.validate_clicked and edited_solution:
                 with st.spinner("Analyzing unit tests..."):
                     validation_result = validate_unit_tests(
-                        client, edited_solution, model="o1-preview", temperature=1
+                        client, edited_solution, model="o3-mini", temperature=1
                     )
                     if validation_result and validation_result["status"] == "success":
                         st.markdown("### Unit Tests Validation")

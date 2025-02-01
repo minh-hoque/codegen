@@ -20,7 +20,8 @@ from utils.solution_tester import TestResult
 
 def render_debug_page():
     st.title("Debug Solution")
-    st.markdown("""
+    st.markdown(
+        """
     Test and debug your solution to ensure it works correctly. Run the test cases to verify your solution, 
     and use the AI Debug Assistant if you need help fixing any issues.
     
@@ -30,7 +31,8 @@ def render_debug_page():
     3. Use AI Debug Help if needed
     4. Apply suggested fixes
     5. Re-run tests to verify fixes
-    """)
+    """
+    )
 
     initialize_session_state()
 
@@ -63,13 +65,13 @@ def render_debug_page():
 
     st.markdown("### Debug Solution")
     st.markdown(f"Solution file: `{challenge_file}`")
-    
+
     # Replace st.code with st.text_area for editing
     edited_solution = st.text_area(
         "Edit your solution here:",
         value=saved_solution,
         height=400,
-        key="solution_editor"
+        key="solution_editor",
     )
 
     # Save changes when the solution is edited
@@ -81,7 +83,7 @@ def render_debug_page():
             st.success("Changes saved successfully!")
         except Exception as e:
             st.error(f"Error saving changes: {str(e)}")
-    
+
     # Update saved_solution to use edited version
     saved_solution = edited_solution
 
@@ -148,7 +150,9 @@ def render_debug_page():
                     )
 
                 # Get AI debugging suggestions
-                debug_response = debug_solution(client, saved_solution, failed_tests)
+                debug_response = debug_solution(
+                    client, saved_solution, failed_tests, model="o3-mini"
+                )
 
                 # Store debug response in session state
                 set_state_value("debug_response", debug_response)
